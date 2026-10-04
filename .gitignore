@@ -1,0 +1,13 @@
+# Dependencias y sistema
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Archivos temporales y PDFs de prueba
+*.log
+*.tmp
+Cotizacion-*.pdf
