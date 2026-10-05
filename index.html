@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sun/Moon Eventos</title>
+  <meta name="description" content="Cotiza el alquiler de sillas, mesas y toldos para tu evento y descarga tu cotización en PDF.">
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="top">
+      <div class="brand">
+        <img src="assets/img/favicon.svg" alt="" width="34" height="34">
+        <span>Sun<em>/</em>Moon Eventos</span>
+      </div>
+      <a class="cta" href="#cotizador">Cotizar</a>
+    </header>
+
+    <section class="hero">
+      <div>
+        <h1>Sillas, mesas y toldos para tu <mark>evento</mark>.</h1>
+        <p>Elige lo que necesitas, indica la fecha y el lugar, y descarga tu cotización en PDF al momento. Precio fijo por evento.</p>
+      </div>
+      <ol class="steps">
+        <li><b>1</b> Elige tu mobiliario</li>
+        <li><b>2</b> Completa fecha y lugar</li>
+        <li><b>3</b> Descarga el PDF o escríbenos por WhatsApp</li>
+      </ol>
+    </section>
+
+    <main class="main" id="cotizador">
+      <div class="catalog" id="catalog"></div>
+
+      <aside class="quote" aria-labelledby="qt">
+        <h2 id="qt">Tu cotización</h2>
+
+        <form id="form" novalidate>
+          <fieldset>
+            <div class="field">
+              <label for="nombre">Nombre <i>*</i></label>
+              <input id="nombre" name="nombre" autocomplete="name" placeholder="Ej. María López">
+              <span class="err" id="e-nombre"></span>
+            </div>
+            <div>
+              <div class="field">
+                <label for="tel">Teléfono <i>*</i></label>
+                <input id="tel" name="tel" inputmode="tel" autocomplete="tel" placeholder="5555 1234">
+                <span class="err" id="e-tel"></span>
+              </div>
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="fecha">Fecha del evento <i>*</i></label>
+                <input id="fecha" name="fecha" type="date">
+                <span class="err" id="e-fecha"></span>
+              </div>
+              <div class="field">
+                <label for="tipo">Tipo de evento</label>
+                <select id="tipo" name="tipo">
+                  <option>Cumpleaños</option>
+                  <option>Convivio</option>
+                  <option>Baby Shower</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="lugar">Lugar del evento <i>*</i></label>
+              <textarea id="lugar" name="lugar" autocomplete="street-address" placeholder="Zona, municipio o dirección"></textarea>
+              <span class="err" id="e-lugar"></span>
+            </div>
+            <div class="field">
+              <label for="notas">Notas</label>
+              <textarea id="notas" name="notas" placeholder="Horario de entrega, piso, acceso…"></textarea>
+            </div>
+          </fieldset>
+        </form>
+
+        <ul class="lines" id="lines" aria-live="polite"></ul>
+        <div class="total"><span>Total estimado</span><span id="total">Q0.00</span></div>
+
+        <div class="btns">
+          <button class="btn primary" id="btn-pdf" type="button">Descargar cotización en PDF</button>
+          <a class="btn wa" id="btn-wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+        </div>
+        <p class="status" id="status" role="status"></p>
+        <p class="note">Precios por evento, sin flete. La cotización es válida por 7 días y está sujeta a disponibilidad en la fecha elegida.</p>
+      </aside>
+    </main>
+
+    <footer>
+      <span>Sun/Moon Eventos · Alquiler de mobiliario</span>
+      <span id="contact"></span>
+    </footer>
+
+  </div>
+
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/utils.js" defer></script>
+  <script src="assets/vendor/jspdf.umd.min.js" defer></script>
+  <script src="assets/js/pdf.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>
