@@ -1,4 +1,4 @@
-# Sun/Moon Eventos · Cotizador de mobiliario
+# Sun&Moon Eventos · Cotizador de mobiliario
 
 Landing page para que los clientes cotizen el alquiler de sillas, mesas, toldos y otros artículos para su evento, y descarguen la cotización en PDF al momento. Es un sitio estático (HTML, CSS y JavaScript), sin servidor ni proceso de compilación.
 
@@ -62,16 +62,7 @@ Para agregar un artículo, añade un objeto a la lista `items` del grupo corresp
 
 Los colores y las tipografías están como variables al inicio de `assets/css/styles.css`.
 
-> Los precios y el número de WhatsApp incluidos son de ejemplo. Reemplázalos antes de publicar.
-
-## Publicar en GitHub Pages
-
-1. Sube el proyecto a un repositorio en GitHub.
-2. En el repositorio, abre **Settings → Pages**.
-3. En **Build and deployment**, elige **Deploy from a branch**, la rama `main` y la carpeta `/ (root)`.
-4. Guarda. GitHub publicará el sitio en `https://<usuario>.github.io/<repositorio>/`.
-
-También funciona en Netlify, Vercel o cualquier hosting estático: basta con subir la carpeta.
+> Los precios y el número de WhatsApp incluidos son de ejemplo.
 
 ## Limitaciones actuales
 
