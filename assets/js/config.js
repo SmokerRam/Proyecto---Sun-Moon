@@ -8,10 +8,10 @@ window.SunMoon.config = {
   negocio: "Sun&Moon Eventos",
 
   // Número con código de país, sin "+" ni espacios (ejemplo: 502 + 8 dígitos).
-  whatsapp: "50237956338",
+  whatsapp: "50259344700",
 
   // Se muestran en el pie de la página y en el PDF.
-  telefonoVisible: "+502 3795 6338",
+  telefonoVisible: "+502 5934 4700",
   correoVisible: "",
 
   validezDias: 7,

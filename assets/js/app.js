@@ -123,6 +123,8 @@
       email: val("email"),
       tipo: val("tipo"),
       fecha: val("fecha"),
+      horaEntrega: val("hentrega"),
+      horaEvento: val("hevento"),
       lugar: val("lugar"),
       notas: val("notas")
     };
@@ -156,6 +158,12 @@
     revisar("nombre", val("nombre").length >= 2, "Escribe tu nombre.");
     revisar("tel", val("tel").replace(/\D/g, "").length >= 8, "Escribe un teléfono de 8 dígitos o más.");
     revisar("fecha", !!val("fecha") && val("fecha") >= u.hoyISO(), "Elige una fecha desde hoy en adelante.");
+    revisar("hentrega", !!val("hentrega"), "Indica a qué hora quieres la entrega.");
+    revisar("hevento", !!val("hevento"), "Indica a qué hora empieza el evento.");
+    // Las horas son "HH:MM", así que se pueden comparar como texto. Solo se compara si ambas existen.
+    if (val("hentrega") && val("hevento")) {
+      revisar("hentrega", val("hentrega") < val("hevento"), "La entrega debe ser antes de la hora del evento.");
+    }
     revisar("lugar", val("lugar").length >= 3, "Indica dónde será el evento.");
 
     if (seleccionados().length === 0) {
@@ -175,6 +183,8 @@
     var t = "Hola, quiero cotizar un evento con " + cfg.negocio + ".\n";
     if (c.nombre) { t += "Nombre: " + c.nombre + "\n"; }
     if (c.fecha)  { t += "Fecha: " + u.fmtFecha(c.fecha) + "\n"; }
+    if (c.horaEntrega) { t += "Hora de entrega: " + u.fmtHora(c.horaEntrega) + "\n"; }
+    if (c.horaEvento)  { t += "Hora del evento: " + u.fmtHora(c.horaEvento) + "\n"; }
     if (c.lugar)  { t += "Lugar: " + c.lugar + "\n"; }
     t += "\n";
     seleccionados().forEach(function (l) {
@@ -233,7 +243,7 @@
       setEstado("Se abrirá WhatsApp con el resumen. Adjunta el PDF que descargaste.", "ok");
     });
 
-    ["nombre", "tel", "fecha", "lugar"].forEach(function (id) {
+    ["nombre", "tel", "fecha", "hentrega", "hevento", "lugar"].forEach(function (id) {
       var campo = $(id);
       if (campo) {
         campo.addEventListener("input", function () { $("btn-wa").href = enlaceWhatsApp(); });

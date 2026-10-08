@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Sun/Moon Eventos</title>
   <meta name="description" content="Cotiza el alquiler de sillas, mesas y toldos para tu evento y descarga tu cotización en PDF.">
-  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+  <meta name="theme-color" content="#02033C">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,27 +14,32 @@
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
+  <div class="band">
+    <div class="wrap">
+
+      <header class="top">
+        <a class="brand" href="#" aria-label="Sun &amp; Moon Eventos, inicio">
+          <img src="assets/img/logo.png" alt="Sun &amp; Moon Eventos" width="420" height="500">
+        </a>
+        <a class="cta" href="#cotizador">Cotizar</a>
+      </header>
+
+      <section class="hero">
+        <div>
+          <h1>¡Iluminamos tu <mark>evento</mark>!</h1>
+          <p>Alquiler de sillas, mesas, toldos y más. Elige lo que necesitas, indica la fecha, las horas y el lugar, y descarga tu cotización en PDF al momento. Precio fijo por evento.</p>
+        </div>
+        <ol class="steps">
+          <li><b>1</b> Elige tu mobiliario</li>
+          <li><b>2</b> Completa fecha, horas y lugar</li>
+          <li><b>3</b> Descarga el PDF o escríbenos por WhatsApp</li>
+        </ol>
+      </section>
+
+    </div>
+  </div>
+
   <div class="wrap">
-
-    <header class="top">
-      <div class="brand">
-        <img src="assets/img/favicon.svg" alt="" width="34" height="34">
-        <span>Sun<em>/</em>Moon Eventos</span>
-      </div>
-      <a class="cta" href="#cotizador">Cotizar</a>
-    </header>
-
-    <section class="hero">
-      <div>
-        <h1>Sillas, mesas y toldos para tu <mark>evento</mark>.</h1>
-        <p>Elige lo que necesitas, indica la fecha y el lugar, y descarga tu cotización en PDF al momento. Precio fijo por evento.</p>
-      </div>
-      <ol class="steps">
-        <li><b>1</b> Elige tu mobiliario</li>
-        <li><b>2</b> Completa fecha y lugar</li>
-        <li><b>3</b> Descarga el PDF o escríbenos por WhatsApp</li>
-      </ol>
-    </section>
 
     <main class="main" id="cotizador">
       <div class="catalog" id="catalog"></div>
@@ -71,6 +77,18 @@
                 </select>
               </div>
             </div>
+            <div class="row2">
+              <div class="field">
+                <label for="hentrega">Hora de entrega <i>*</i></label>
+                <input id="hentrega" name="hentrega" type="time">
+                <span class="err" id="e-hentrega"></span>
+              </div>
+              <div class="field">
+                <label for="hevento">Hora del evento <i>*</i></label>
+                <input id="hevento" name="hevento" type="time">
+                <span class="err" id="e-hevento"></span>
+              </div>
+            </div>
             <div class="field">
               <label for="lugar">Lugar del evento <i>*</i></label>
               <textarea id="lugar" name="lugar" autocomplete="street-address" placeholder="Zona, municipio o dirección"></textarea>
@@ -78,7 +96,7 @@
             </div>
             <div class="field">
               <label for="notas">Notas</label>
-              <textarea id="notas" name="notas" placeholder="Horario de entrega, piso, acceso…"></textarea>
+              <textarea id="notas" name="notas" placeholder="Piso, acceso, indicaciones para la entrega…"></textarea>
             </div>
           </fieldset>
         </form>
@@ -95,15 +113,18 @@
       </aside>
     </main>
 
-    <footer>
-      <span>Sun/Moon Eventos · Alquiler de mobiliario</span>
-      <span id="contact"></span>
-    </footer>
-
   </div>
+
+  <footer class="foot">
+    <div class="wrap">
+      <span>Sun &amp; Moon Eventos · Alquiler de sillas, mesas, toldos y más</span>
+      <span id="contact"></span>
+    </div>
+  </footer>
 
   <script src="assets/js/config.js" defer></script>
   <script src="assets/js/utils.js" defer></script>
+  <script src="assets/js/logo-data.js" defer></script>
   <script src="assets/vendor/jspdf.umd.min.js" defer></script>
   <script src="assets/js/pdf.js" defer></script>
   <script src="assets/js/app.js" defer></script>

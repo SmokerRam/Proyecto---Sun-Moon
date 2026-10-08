@@ -3,7 +3,7 @@
  *
  * SunMoon.pdf.generar(datos) recibe:
  *   {
- *     cliente: { nombre, tel, email, tipo, fecha (AAAA-MM-DD), lugar, notas },
+ *     cliente: { nombre, tel, email, tipo, fecha (AAAA-MM-DD), horaEntrega (HH:MM), horaEvento (HH:MM), lugar, notas },
  *     lineas:  [{ grupo, nombre, cant, precio, sub }],
  *     total:   number
  *   }
@@ -12,15 +12,17 @@
 (function (SM) {
   "use strict";
 
+  // Paleta oficial del Flyer Promo: azul marino #02033C, lavanda #807F9E y degradado del logo.
   var COLOR = {
-    ink:  [20, 24, 56],
-    sun:  [242, 163, 27],
-    sunLight: [246, 182, 63],
-    moon: [61, 75, 176],
-    gray: [100, 106, 140],
-    line: [213, 217, 234],
-    headBg: [231, 234, 244],
-    onDark: [200, 205, 235]
+    ink:  [2, 3, 60],
+    sun:  [218, 116, 42],       // #DA742A, naranja profundo (texto sobre blanco)
+    sunBright: [255, 168, 42],  // #FFA82A
+    sunLight: [255, 204, 34],   // #FFCC22
+    moon: [2, 3, 60],           // títulos de sección en azul marino
+    gray: [74, 75, 120],
+    line: [212, 212, 226],
+    headBg: [236, 236, 244],
+    onDark: [214, 214, 234]
   };
 
   var PAGE = { w: 215.9, h: 279.4, margin: 18 }; // carta, en mm
@@ -43,20 +45,25 @@
 
     function encabezado() {
       color("setFillColor", COLOR.ink);
-      doc.rect(0, 0, W, 34, "F");
+      doc.rect(0, 0, W, 38, "F");
+      color("setFillColor", COLOR.sunBright);
+      doc.rect(0, 38, W, 1.2, "F");
 
-      // Logo: sol y luna
-      color("setFillColor", COLOR.moon); doc.circle(M + 6, 17, 6, "F");
-      color("setFillColor", COLOR.sun);  doc.circle(M + 6, 17, 6, "F");
-      color("setFillColor", COLOR.moon); doc.circle(M + 8.2, 17, 5.2, "F");
+      // Logo oficial (PNG incrustado en assets/js/logo-data.js)
+      var logo = SM.logoPdf, textoX = M;
+      if (logo && logo.src) {
+        var lh = 32, lw = lh * logo.w / logo.h;
+        doc.addImage(logo.src, "PNG", M, 3, lw, lh);
+        textoX = M + lw + 6;
+      }
 
       doc.setTextColor(255, 255, 255);
-      doc.setFont("helvetica", "bold"); doc.setFontSize(18);
-      doc.text(cfg.negocio, M + 16, 16);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(16);
+      doc.text(cfg.negocio, textoX, 17);
 
       doc.setFont("helvetica", "normal"); doc.setFontSize(9.5);
       color("setTextColor", COLOR.onDark);
-      doc.text("Alquiler de sillas, mesas y toldos", M + 16, 22);
+      doc.text("Alquiler de sillas, mesas, toldos y más", textoX, 23);
 
       doc.setFont("helvetica", "bold"); doc.setFontSize(11);
       color("setTextColor", COLOR.sunLight);
@@ -67,7 +74,7 @@
       doc.text("No. " + numero, W - M, 21, { align: "right" });
       doc.text("Emitida: " + emitida, W - M, 26, { align: "right" });
 
-      y = 46;
+      y = 50;
     }
 
     function encabezadoTabla() {
@@ -108,6 +115,8 @@
       ["Correo", cliente.email],
       ["Evento", cliente.tipo],
       ["Fecha", u.fmtFecha(cliente.fecha)],
+      ["Hora de entrega", cliente.horaEntrega ? u.fmtHora(cliente.horaEntrega) : ""],
+      ["Hora del evento", cliente.horaEvento ? u.fmtHora(cliente.horaEvento) : ""],
       ["Lugar", cliente.lugar]
     ].filter(function (f) { return f[1]; }); // omite las filas de campos que no existen o están vacíos
     doc.setFontSize(10);
@@ -115,8 +124,8 @@
       doc.setFont("helvetica", "bold"); color("setTextColor", COLOR.gray);
       doc.text(f[0], M, y);
       doc.setFont("helvetica", "normal"); color("setTextColor", COLOR.ink);
-      var texto = doc.splitTextToSize(f[1], W - 2 * M - 30);
-      doc.text(texto, M + 30, y);
+      var texto = doc.splitTextToSize(f[1], W - 2 * M - 34);
+      doc.text(texto, M + 34, y);
       y += 5.5 * texto.length;
     });
     y += 6;

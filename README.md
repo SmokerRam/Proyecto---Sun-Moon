@@ -5,10 +5,11 @@ Landing page para que los clientes cotizen el alquiler de sillas, mesas, toldos 
 ## Funciones
 
 - Catálogo por categorías (sillas, mesas, toldos y otros artículos) con precio fijo por evento.
-- Formulario con nombre, teléfono, correo, fecha, tipo de evento, lugar y notas.
+- Formulario con nombre, teléfono, fecha, **hora de entrega**, **hora del evento**, tipo de evento, lugar y notas. La hora de entrega debe ser anterior a la del evento.
 - Total calculado en tiempo real.
 - PDF de cotización generado en el navegador con [jsPDF](https://github.com/parallax/jsPDF).
 - Botón de WhatsApp con el resumen del pedido ya escrito.
+- Identidad visual del Flyer Promo: logo oficial y paleta azul marino, lavanda y degradado naranja.
 - Tema claro y oscuro según la preferencia del dispositivo.
 - Diseño adaptable a celular.
 
@@ -23,17 +24,19 @@ sun-moon-eventos/
 │   ├── js/
 │   │   ├── config.js           # Datos del negocio y catálogo de precios (editar aquí)
 │   │   ├── utils.js            # Formato de moneda y fechas, número de cotización
+│   │   ├── logo-data.js        # Logo en base64 para el PDF (se genera desde img/logo.png)
 │   │   ├── pdf.js              # Generación del PDF
 │   │   └── app.js              # Catálogo, formulario, validación y eventos
 │   ├── img/
-│   │   └── favicon.svg         # Logo sol/luna
+│   │   ├── logo.png            # Logo oficial Sun & Moon Eventos
+│   │   └── favicon.png         # Icono de la pestaña (remolino del logo)
 │   └── vendor/
 │       └── jspdf.umd.min.js    # jsPDF 2.5.2 (MIT), incluido localmente
 ├── .gitignore
 └── README.md
 ```
 
-Los scripts se cargan en este orden y comparten el espacio `window.SunMoon`: `config.js`, `utils.js`, jsPDF, `pdf.js`, `app.js`.
+Los scripts se cargan en este orden y comparten el espacio `window.SunMoon`: `config.js`, `utils.js`, `logo-data.js`, jsPDF, `pdf.js`, `app.js`.
 
 ## Uso local
 
@@ -60,7 +63,15 @@ Todo lo que cambia de un negocio a otro está en `assets/js/config.js`:
 
 Para agregar un artículo, añade un objeto a la lista `items` del grupo correspondiente con un `id` único, `nombre`, `desc` y `precio`.
 
-Los colores y las tipografías están como variables al inicio de `assets/css/styles.css`.
+Los colores y las tipografías están como variables al inicio de `assets/css/styles.css`. Paleta oficial:
+
+| Color | Hex | Uso |
+| --- | --- | --- |
+| Azul marino | `#02033C` | Encabezado, pie, textos |
+| Lavanda | `#807F9E` | Fondo de la página |
+| Naranja del logo | `#FFCC22` → `#FFA82A` → `#DA742A` | Botones, acentos, degradado |
+
+Si cambias `assets/img/logo.png`, regenera `assets/js/logo-data.js` (el PDF usa esa copia incrustada para funcionar también sin servidor).
 
 > Los precios y el número de WhatsApp incluidos son de ejemplo.
 

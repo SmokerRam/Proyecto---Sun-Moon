@@ -20,6 +20,13 @@
     });
   }
 
+  // "15:30" -> "3:30 p. m."
+  function fmtHora(hhmm) {
+    var p = hhmm.split(":");
+    var d = new Date(2000, 0, 1, +p[0], +p[1]);
+    return d.toLocaleTimeString("es-GT", { hour: "numeric", minute: "2-digit", hour12: true });
+  }
+
   // "04 de octubre de 2026"
   function fmtFechaCorta(date) {
     return date.toLocaleDateString("es-GT", {
@@ -45,6 +52,7 @@
   SM.utils = {
     money: money,
     fmtFecha: fmtFecha,
+    fmtHora: fmtHora,
     fmtFechaCorta: fmtFechaCorta,
     numCotizacion: numCotizacion,
     hoyISO: hoyISO
