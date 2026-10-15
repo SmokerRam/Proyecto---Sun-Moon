@@ -8,6 +8,7 @@ Landing page para que los clientes cotizen el alquiler de sillas, mesas, toldos 
 - Formulario con nombre, teléfono, fecha, **hora de entrega**, **hora del evento**, tipo de evento, lugar y notas. La hora de entrega debe ser anterior a la del evento.
 - Total calculado en tiempo real.
 - PDF de cotización generado en el navegador con [jsPDF](https://github.com/parallax/jsPDF).
+- Envío de la cotización por correo, con el PDF adjunto, mediante Google Apps Script y un Gmail del negocio (opcional, ver [Envío por correo](#envío-por-correo)).
 - Botón de WhatsApp con el resumen del pedido ya escrito.
 - Identidad visual del Flyer Promo: logo oficial y paleta azul marino, lavanda y degradado naranja.
 - Tema claro y oscuro según la preferencia del dispositivo.
@@ -18,6 +19,8 @@ Landing page para que los clientes cotizen el alquiler de sillas, mesas, toldos 
 ```
 sun-moon-eventos/
 ├── index.html                  # Estructura de la página
+├── apps-script/
+│   └── Code.gs                 # Script de Google que envía la cotización por correo
 ├── assets/
 │   ├── css/
 │   │   └── styles.css          # Estilos, tokens de color y tipografía
@@ -58,6 +61,7 @@ Todo lo que cambia de un negocio a otro está en `assets/js/config.js`:
 | `negocio` | Nombre que aparece en el PDF y en el mensaje de WhatsApp |
 | `whatsapp` | Número con código de país, sin `+` ni espacios (ejemplo: `50255551234`) |
 | `telefonoVisible`, `correoVisible` | Contacto mostrado en el pie y en el PDF |
+| `envioCorreo.url` | URL de la aplicación web de Google Apps Script. Vacía = el botón de correo no aparece |
 | `validezDias` | Días de vigencia de la cotización |
 | `grupos` | Categorías y artículos con su precio por evento |
 
@@ -75,9 +79,33 @@ Si cambias `assets/img/logo.png`, regenera `assets/js/logo-data.js` (el PDF usa 
 
 > Los precios y el número de WhatsApp incluidos son de ejemplo.
 
+## Envío por correo
+
+El botón **Enviar cotización por correo** manda el PDF al correo del cliente y una copia al negocio. No usa servidores propios: la página envía los datos a un script de Google Apps Script que publica el Gmail del negocio, y ese script manda los correos desde esa cuenta. Es gratis y no necesita dominio.
+
+### Instalación (una sola vez, unos 10 minutos)
+
+1. Entra a [script.google.com](https://script.google.com) con el **Gmail del negocio** (los correos saldrán desde esa cuenta) y crea un **Proyecto nuevo**.
+2. Borra el contenido de `Code.gs` y pega el de [`apps-script/Code.gs`](apps-script/Code.gs). Revisa el bloque `CONFIG` de arriba: nombre del negocio, teléfono y, si quieres que la copia llegue a otro correo, `CORREO_COPIA`. Guarda.
+3. Clic en **Implementar → Nueva implementación**. En el engranaje elige **Aplicación web** y configura:
+   - **Ejecutar como:** Yo
+   - **Quién tiene acceso:** Cualquier persona
+4. Clic en **Implementar** y autoriza los permisos. Si Google avisa que la app no está verificada, elige **Avanzado → Ir a (nombre del proyecto)**; es tu propio script.
+5. Copia la **URL de la aplicación web** (termina en `/exec`). Ábrela en el navegador: debe mostrar `{"ok":true,...}`.
+6. Pégala en `assets/js/config.js`, en `envioCorreo.url`, y sube el cambio. Al recargar la página aparecen el campo de correo y el botón.
+
+Si más adelante cambias `Code.gs`, usa **Implementar → Administrar implementaciones → editar → Nueva versión**. La URL no cambia.
+
+### Qué hay que saber
+
+- Los correos salen desde el Gmail que publicó el script, con el nombre "Sun&Moon Eventos". Pueden caer en spam la primera vez; pide a los clientes que revisen esa carpeta.
+- Gmail limita los envíos diarios (cerca de 100 destinatarios al día en cuentas gratuitas). Cada cotización usa 2 (cliente y copia), y el script se detiene en `MAX_COTIZACIONES_DIA` (40 por defecto) para no agotar la cuota.
+- La URL del script queda a la vista en el código de la página. Para que no sirva para enviar spam, el correo al cliente usa una plantilla fija, se valida el correo y el PDF, y hay un campo trampa para bots y el tope diario. Si empiezan a llegar envíos falsos, se puede agregar Cloudflare Turnstile.
+- Con un dominio propio se puede cambiar a Resend para enviar desde `cotizaciones@tudominio.com`. Solo cambia la parte del envío, no la página.
+
 ## Limitaciones actuales
 
-- El PDF se descarga en el dispositivo del cliente. No se envía por correo automáticamente; eso requiere un servicio externo (por ejemplo EmailJS o Resend) o un backend.
+- Sin la URL de Apps Script en `config.js`, el PDF solo se descarga en el dispositivo del cliente.
 - WhatsApp no permite adjuntar el PDF por enlace, así que el cliente debe adjuntarlo manualmente.
 - La página no consulta disponibilidad de inventario por fecha.
 
@@ -85,7 +113,7 @@ Si cambias `assets/img/logo.png`, regenera `assets/js/logo-data.js` (el PDF usa 
 
 - Calendario de eventos en vivo con la cantidad de mobiliario alquilado.
 - Inventario disponible en tiempo real, incluyendo el que se libera al terminar cada evento.
-- Envío de la cotización por correo.
+- Envío del PDF por WhatsApp (por ejemplo con el menú de compartir del celular).
 
 ## Créditos
 

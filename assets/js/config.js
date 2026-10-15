@@ -14,6 +14,13 @@ window.SunMoon.config = {
   telefonoVisible: "+502 5934 4700",
   correoVisible: "",
 
+  // Envío de la cotización por correo (Google Apps Script, ver apps-script/Code.gs y el README).
+  // Pega aquí la URL de la aplicación web que termina en /exec.
+  // Mientras esté vacío, el botón "Enviar cotización por correo" no aparece.
+  envioCorreo: {
+    url: ""
+  },
+
   validezDias: 7,
   moneda: "Q",
 

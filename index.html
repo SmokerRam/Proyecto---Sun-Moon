@@ -54,12 +54,20 @@
               <input id="nombre" name="nombre" autocomplete="name" placeholder="Ej. María López">
               <span class="err" id="e-nombre"></span>
             </div>
-            <div>
-              <div class="field">
-                <label for="tel">Teléfono <i>*</i></label>
-                <input id="tel" name="tel" inputmode="tel" autocomplete="tel" placeholder="5555 1234">
-                <span class="err" id="e-tel"></span>
-              </div>
+            <div class="field">
+              <label for="tel">Teléfono <i>*</i></label>
+              <input id="tel" name="tel" inputmode="tel" autocomplete="tel" placeholder="5555 1234">
+              <span class="err" id="e-tel"></span>
+            </div>
+            <div class="field" id="campo-email" hidden>
+              <label for="email">Correo electrónico <small>(para recibir la cotización)</small></label>
+              <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="nombre@correo.com">
+              <span class="err" id="e-email"></span>
+            </div>
+            <!-- Campo trampa para bots: se oculta con CSS y las personas no lo llenan. -->
+            <div class="hp" aria-hidden="true">
+              <label for="web">No llenar este campo</label>
+              <input id="web" name="web" type="text" tabindex="-1" autocomplete="off">
             </div>
             <div class="row2">
               <div class="field">
@@ -106,6 +114,7 @@
 
         <div class="btns">
           <button class="btn primary" id="btn-pdf" type="button">Descargar cotización en PDF</button>
+          <button class="btn mail" id="btn-mail" type="button" hidden>Enviar cotización por correo</button>
           <a class="btn wa" id="btn-wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
         </div>
         <p class="status" id="status" role="status"></p>
