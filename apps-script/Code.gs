@@ -3,8 +3,8 @@
  *
  * La página genera el PDF en el navegador y lo manda aquí en base64. Este script:
  *   1. valida los datos,
- *   2. envía el PDF al correo del cliente desde el Gmail que publique el script,
- *   3. envía una copia con los datos del evento al negocio.
+ *   2. envía siempre una copia con los datos del evento y el PDF al negocio,
+ *   3. si el cliente dejó su correo, le envía también el PDF desde el Gmail que publique el script.
  *
  * Instalación: ver la sección "Envío por correo" del README.md.
  *
@@ -82,7 +82,8 @@ function leerDatos_(e) {
   if (d.hp) { return d; }
 
   if (d.nombre.length < 2) { throw new Error("Falta el nombre."); }
-  if (!/^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]{2,}$/.test(d.email)) { throw new Error("El correo no es válido."); }
+  // El correo del cliente es opcional; si lo dejó, debe ser uno solo y válido.
+  if (d.email && !/^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]{2,}$/.test(d.email)) { throw new Error("El correo no es válido."); }
   if (!/^Cotizacion-[A-Za-z0-9-]+\.pdf$/.test(d.pdfNombre)) { d.pdfNombre = "Cotizacion.pdf"; }
 
   if (!d.pdfBase64 || d.pdfBase64.length > CONFIG.MAX_PDF_BYTES * 1.4) { throw new Error("El PDF falta o es demasiado grande."); }
@@ -131,7 +132,24 @@ function enviarCorreos_(d) {
     return "<tr><td style=\"padding:2px 12px 2px 0;color:#4A4B78\">" + esc_(f[0]) + "</td><td><b>" + esc_(f[1]) + "</b></td></tr>";
   }).join("");
 
-  // 1) Correo al cliente, con plantilla fija.
+  // 1) Copia para el negocio: siempre se envía, con todos los datos de contacto.
+  var aviso = {
+    to: copia,
+    name: CONFIG.NEGOCIO + " (cotizaciones)",
+    subject: "Nueva cotización: " + d.nombre + (d.fecha ? " - " + d.fecha : ""),
+    body: "Nueva cotización generada desde la página.\n\n" +
+      "Cliente: " + d.nombre + "\nTeléfono: " + d.tel + "\nCorreo: " + (d.email || "(no dejó correo)") + "\n" +
+      detalleTxt + "\n\n" +
+      (d.resumen.length ? "Artículos:\n" + d.resumen.join("\n") + "\n\n" : "") +
+      "Total estimado: " + d.total + "\n" +
+      (d.notas ? "\nNotas del cliente: " + d.notas + "\n" : ""),
+    attachments: [pdf]
+  };
+  if (d.email) { aviso.replyTo = d.email; }
+  MailApp.sendEmail(aviso);
+
+  // 2) Correo al cliente, con plantilla fija, solo si dejó su correo.
+  if (!d.email) { return; }
   MailApp.sendEmail({
     to: d.email,
     replyTo: copia,
@@ -151,21 +169,6 @@ function enviarCorreos_(d) {
       "<p>Para confirmar tu reserva, responde este correo o escríbenos por WhatsApp al <b>" + esc_(CONFIG.TELEFONO) + "</b>.<br>" +
       "<span style=\"color:#4A4B78;font-size:13px\">La cotización está sujeta a disponibilidad en la fecha del evento.</span></p>" +
       "<p style=\"color:#DA742A\"><b>" + esc_(CONFIG.NEGOCIO) + "</b></p></div>",
-    attachments: [pdf]
-  });
-
-  // 2) Copia para el negocio, con todos los datos de contacto.
-  MailApp.sendEmail({
-    to: copia,
-    replyTo: d.email,
-    name: CONFIG.NEGOCIO + " (cotizaciones)",
-    subject: "Nueva cotización: " + d.nombre + (d.fecha ? " - " + d.fecha : ""),
-    body: "Nueva cotización enviada desde la página.\n\n" +
-      "Cliente: " + d.nombre + "\nTeléfono: " + d.tel + "\nCorreo: " + d.email + "\n" +
-      detalleTxt + "\n\n" +
-      (d.resumen.length ? "Artículos:\n" + d.resumen.join("\n") + "\n\n" : "") +
-      "Total estimado: " + d.total + "\n" +
-      (d.notas ? "\nNotas del cliente: " + d.notas + "\n" : ""),
     attachments: [pdf]
   });
 }

@@ -61,7 +61,7 @@ Todo lo que cambia de un negocio a otro está en `assets/js/config.js`:
 | `negocio` | Nombre que aparece en el PDF y en el mensaje de WhatsApp |
 | `whatsapp` | Número con código de país, sin `+` ni espacios (ejemplo: `50255551234`) |
 | `telefonoVisible`, `correoVisible` | Contacto mostrado en el pie y en el PDF |
-| `envioCorreo.url` | URL de la aplicación web de Google Apps Script. Vacía = el botón de correo no aparece |
+| `envioCorreo.url` | URL de la aplicación web de Google Apps Script. Vacía = no se envía correo y el campo de correo no aparece |
 | `validezDias` | Días de vigencia de la cotización |
 | `grupos` | Categorías y artículos con su precio por evento |
 
@@ -81,7 +81,14 @@ Si cambias `assets/img/logo.png`, regenera `assets/js/logo-data.js` (el PDF usa 
 
 ## Envío por correo
 
-El botón **Enviar cotización por correo** manda el PDF al correo del cliente y una copia al negocio. No usa servidores propios: la página envía los datos a un script de Google Apps Script que publica el Gmail del negocio, y ese script manda los correos desde esa cuenta. Es gratis y no necesita dominio.
+La página tiene dos botones: **Generar cotización** y **Enviar por WhatsApp**. Al generar la cotización siempre se descarga el PDF y, si el envío por correo está configurado, también:
+
+- Se envía una **copia al negocio** con los datos del cliente, los artículos y el PDF. Llega siempre.
+- Si el cliente escribió su correo (campo opcional), se le envía **también a él** el PDF.
+
+Si el PDF se descarga pero el correo falla, la página lo avisa y le sugiere escribir por WhatsApp.
+
+No usa servidores propios: la página envía los datos a un script de Google Apps Script que publica el Gmail del negocio, y ese script manda los correos desde esa cuenta. Es gratis y no necesita dominio.
 
 ### Instalación (una sola vez, unos 10 minutos)
 
@@ -92,7 +99,7 @@ El botón **Enviar cotización por correo** manda el PDF al correo del cliente y
    - **Quién tiene acceso:** Cualquier persona
 4. Clic en **Implementar** y autoriza los permisos. Si Google avisa que la app no está verificada, elige **Avanzado → Ir a (nombre del proyecto)**; es tu propio script.
 5. Copia la **URL de la aplicación web** (termina en `/exec`). Ábrela en el navegador: debe mostrar `{"ok":true,...}`.
-6. Pégala en `assets/js/config.js`, en `envioCorreo.url`, y sube el cambio. Al recargar la página aparecen el campo de correo y el botón.
+6. Pégala en `assets/js/config.js`, en `envioCorreo.url`, y sube el cambio. Al recargar la página aparece el campo de correo (opcional). Mientras la URL esté vacía, ese campo no se muestra y el botón solo descarga el PDF.
 
 Si más adelante cambias `Code.gs`, usa **Implementar → Administrar implementaciones → editar → Nueva versión**. La URL no cambia.
 

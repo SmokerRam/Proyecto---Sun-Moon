@@ -18,7 +18,7 @@ window.SunMoon.config = {
   // Pega aquí la URL de la aplicación web que termina en /exec.
   // Mientras esté vacío, el botón "Enviar cotización por correo" no aparece.
   envioCorreo: {
-    url: ""
+    url: "https://script.google.com/macros/s/AKfycbxGrWJ3SYqh3_9BWcen3jh0JcpQK7M47db0mEZuKK2Vw4I80l24F74B6ooo8A4QjrMi8Q/exec"
   },
 
   validezDias: 7,

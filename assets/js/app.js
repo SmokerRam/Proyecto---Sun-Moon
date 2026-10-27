@@ -142,8 +142,7 @@
     s.className = "status " + (clase || "");
   }
 
-  // conCorreo: true cuando se va a enviar por correo, que exige un correo válido.
-  function validar(conCorreo) {
+  function validar() {
     var ok = true, primero = null;
 
     function revisar(id, condicion, mensaje) {
@@ -158,11 +157,8 @@
 
     revisar("nombre", val("nombre").length >= 2, "Escribe tu nombre.");
     revisar("tel", val("tel").replace(/\D/g, "").length >= 8, "Escribe un teléfono de 8 dígitos o más.");
-    if (conCorreo) {
-      revisar("email", /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val("email")), "Escribe un correo válido para enviarte la cotización.");
-    } else {
-      setError("email", "");
-    }
+    // El correo es opcional, pero si lo escriben debe estar completo.
+    revisar("email", !val("email") || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val("email")), "Revisa el correo: parece incompleto.");
     revisar("fecha", !!val("fecha") && val("fecha") >= u.hoyISO(), "Elige una fecha desde hoy en adelante.");
     revisar("hentrega", !!val("hentrega"), "Indica a qué hora quieres la entrega.");
     revisar("hevento", !!val("hevento"), "Indica a qué hora empieza el evento.");
@@ -218,104 +214,97 @@
     document.head.appendChild(s);
   }
 
-  // ---------- Envío por correo ----------
+  // ---------- Generar cotización: PDF + correo ----------
   function correoConfigurado() {
     return !!(cfg.envioCorreo && cfg.envioCorreo.url);
   }
 
-  function enviarPorCorreo() {
-    if (!validar(true)) { return; }
-    if (!correoConfigurado()) {
-      setEstado("El envío por correo aún no está disponible.", "bad");
-      return;
-    }
+  // Descarga el PDF y, si hay script configurado, lo envía por correo.
+  function generarCotizacion() {
+    if (!validar()) { return; }
 
     asegurarLibreriaPdf(function (faltaLibreria) {
       if (faltaLibreria) {
-        setEstado("No se cargó la librería del PDF. Revisa tu conexión e inténtalo de nuevo.", "bad");
+        setEstado("No se cargó la librería del PDF. Verifica que la carpeta assets/vendor esté junto a index.html o revisa tu conexión.", "bad");
         return;
       }
 
       var c = datosCliente();
       var lineas = seleccionados();
-      var payload;
+      var r;
       try {
-        var r = SM.pdf.generar({ cliente: c, lineas: lineas, total: total() });
-        var uri = r.doc.output("datauristring"); // data:application/pdf;...;base64,XXXX
-        payload = {
-          hp: val("web"),
-          nombre: c.nombre,
-          email: c.email,
-          tel: c.tel,
-          tipo: c.tipo,
-          fecha: u.fmtFecha(c.fecha),
-          horaEntrega: u.fmtHora(c.horaEntrega),
-          horaEvento: u.fmtHora(c.horaEvento),
-          lugar: c.lugar,
-          notas: c.notas,
-          total: u.money(total()),
-          resumen: lineas.map(function (l) { return l.cant + " × " + l.nombre + " — " + u.money(l.sub); }),
-          pdfNombre: r.nombre,
-          pdfBase64: uri.slice(uri.indexOf("base64,") + 7)
-        };
+        r = SM.pdf.generar({ cliente: c, lineas: lineas, total: total() });
+        r.doc.save(r.nombre);
       } catch (err) {
         if (window.console) { console.error(err); }
         setEstado("No se pudo crear el PDF (" + (err && err.message ? err.message : err) + ").", "bad");
         return;
       }
 
-      var btn = $("btn-mail");
-      var ctrl = window.AbortController ? new AbortController() : null;
-      var corte = setTimeout(function () { if (ctrl) { ctrl.abort(); } }, 30000);
-      btn.disabled = true;
-      setEstado("Enviando cotización…", "");
-
-      // text/plain evita la petición previa (preflight) que Apps Script no responde.
-      fetch(cfg.envioCorreo.url, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload),
-        signal: ctrl ? ctrl.signal : undefined
-      })
-        .then(function (res) { return res.json(); })
-        .then(function (res) {
-          if (!res || !res.ok) { throw new Error(res && res.error ? res.error : "Respuesta inesperada del servidor."); }
-          setEstado("Listo. Enviamos tu cotización a " + c.email + ". Si no la ves, revisa la carpeta de spam.", "ok");
-        })
-        .catch(function (err) {
-          var motivo = err && err.name === "AbortError" ? "tardó demasiado" : (err && err.message ? err.message : err);
-          setEstado("No se pudo enviar el correo (" + motivo + "). Puedes descargar el PDF o escribirnos por WhatsApp.", "bad");
-        })
-        .then(function () { clearTimeout(corte); btn.disabled = false; });
+      if (!correoConfigurado()) {
+        setEstado("Listo. Se descargó " + r.nombre + ".", "ok");
+        return;
+      }
+      enviarPorCorreo(r, c, lineas);
     });
+  }
+
+  function enviarPorCorreo(r, c, lineas) {
+    var btn = $("btn-pdf");
+    var payload;
+    try {
+      var uri = r.doc.output("datauristring"); // data:application/pdf;...;base64,XXXX
+      payload = {
+        hp: val("web"),
+        nombre: c.nombre,
+        email: c.email,
+        tel: c.tel,
+        tipo: c.tipo,
+        fecha: u.fmtFecha(c.fecha),
+        horaEntrega: u.fmtHora(c.horaEntrega),
+        horaEvento: u.fmtHora(c.horaEvento),
+        lugar: c.lugar,
+        notas: c.notas,
+        total: u.money(total()),
+        resumen: lineas.map(function (l) { return l.cant + " × " + l.nombre + " — " + u.money(l.sub); }),
+        pdfNombre: r.nombre,
+        pdfBase64: uri.slice(uri.indexOf("base64,") + 7)
+      };
+    } catch (err) {
+      if (window.console) { console.error(err); }
+      setEstado("Se descargó " + r.nombre + ", pero no se pudo preparar el correo.", "bad");
+      return;
+    }
+
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var corte = setTimeout(function () { if (ctrl) { ctrl.abort(); } }, 30000);
+    btn.disabled = true;
+    setEstado("Se descargó " + r.nombre + ". Enviando correo…", "");
+
+    // text/plain evita la petición previa (preflight) que Apps Script no responde.
+    fetch(cfg.envioCorreo.url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      signal: ctrl ? ctrl.signal : undefined
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        if (!res || !res.ok) { throw new Error(res && res.error ? res.error : "Respuesta inesperada del servidor."); }
+        setEstado(c.email
+          ? "Listo. Se descargó " + r.nombre + " y enviamos una copia a " + c.email + ". Si no la ves, revisa la carpeta de spam."
+          : "Listo. Se descargó " + r.nombre + " y enviamos tu cotización a " + cfg.negocio + ".", "ok");
+      })
+      .catch(function (err) {
+        var motivo = err && err.name === "AbortError" ? "tardó demasiado" : (err && err.message ? err.message : err);
+        setEstado("Se descargó " + r.nombre + ", pero no se pudo enviar el correo (" + motivo + "). Escríbenos por WhatsApp para confirmar.", "bad");
+      })
+      .then(function () { clearTimeout(corte); btn.disabled = false; });
   }
 
   // ---------- Eventos ----------
   function enlazarEventos() {
-    $("btn-pdf").addEventListener("click", function () {
-      if (!validar()) { return; }
-
-      asegurarLibreriaPdf(function (faltaLibreria) {
-        if (faltaLibreria) {
-          setEstado("No se cargó la librería del PDF. Verifica que la carpeta assets/vendor esté junto a index.html o revisa tu conexión.", "bad");
-          return;
-        }
-        try {
-          var r = SM.pdf.generar({
-            cliente: datosCliente(),
-            lineas: seleccionados(),
-            total: total()
-          });
-          r.doc.save(r.nombre);
-          setEstado("Listo. Se descargó " + r.nombre + ".", "ok");
-        } catch (err) {
-          if (window.console) { console.error(err); }
-          setEstado("No se pudo crear el PDF (" + (err && err.message ? err.message : err) + ").", "bad");
-        }
-      });
-    });
-
-    $("btn-mail").addEventListener("click", enviarPorCorreo);
+    $("btn-pdf").addEventListener("click", generarCotizacion);
 
     $("btn-wa").addEventListener("click", function (e) {
       if (!validar()) { e.preventDefault(); return; }
@@ -336,7 +325,6 @@
     if ($("fecha")) { $("fecha").min = u.hoyISO(); }
     $("contact").textContent = cfg.telefonoVisible + (cfg.correoVisible ? " · " + cfg.correoVisible : "");
     // El correo y su botón solo aparecen cuando config.js tiene la URL del Apps Script.
-    $("btn-mail").hidden = !correoConfigurado();
     $("campo-email").hidden = !correoConfigurado();
     crearCatalogo();
     enlazarEventos();

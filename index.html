@@ -60,7 +60,7 @@
               <span class="err" id="e-tel"></span>
             </div>
             <div class="field" id="campo-email" hidden>
-              <label for="email">Correo electrónico <small>(para recibir la cotización)</small></label>
+              <label for="email">Correo electrónico <small>(opcional, para recibir una copia)</small></label>
               <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="nombre@correo.com">
               <span class="err" id="e-email"></span>
             </div>
@@ -113,8 +113,7 @@
         <div class="total"><span>Total estimado</span><span id="total">Q0.00</span></div>
 
         <div class="btns">
-          <button class="btn primary" id="btn-pdf" type="button">Descargar cotización en PDF</button>
-          <button class="btn mail" id="btn-mail" type="button" hidden>Enviar cotización por correo</button>
+          <button class="btn primary" id="btn-pdf" type="button">Generar cotización</button>
           <a class="btn wa" id="btn-wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
         </div>
         <p class="status" id="status" role="status"></p>
