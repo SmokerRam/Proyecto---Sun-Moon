@@ -12,7 +12,7 @@ window.SunMoon.config = {
 
   // Se muestran en el pie de la página y en el PDF.
   telefonoVisible: "+502 5934 4700",
-  correoVisible: "",
+  correoVisible: "sun.moon.eventosgt@gmail.com",
 
   // Envío de la cotización por correo (Google Apps Script, ver apps-script/Code.gs y el README).
   // Pega aquí la URL de la aplicación web que termina en /exec.
