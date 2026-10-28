@@ -57,13 +57,22 @@ window.SunMoon.config = {
       ]
     },
     {
-      id: "otros",
-      titulo: "Otros artículos",
+      id: "manteles",
+      titulo: "Manteles",
       nota: "Precio por unidad, por evento",
       items: [
-        { id: "o1", nombre: "Mantel Rectangular", desc: "Para mesa rectangular", precio: 15, colores: ["Blanco", "Negro", "Rojo", "Azul", "Rosado", "Dorado", "Plateado", "Verde", "Beige", "Otro"] },
-        { id: "o2", nombre: "Mantel Redondo", desc: "Para mesa redonda", precio: 75, colores: ["Blanco", "Negro", "Rojo", "Azul", "Rosado", "Dorado", "Plateado", "Verde", "Beige", "Otro"] },
-        { id: "o3", nombre: "Mantel Coctelero", desc: "Para mesa coctelera", precio: 50, colores: ["Blanco", "Negro", "Rojo", "Azul", "Rosado", "Dorado", "Plateado", "Verde", "Beige", "Otro"] }
+        { id: "mt1", nombre: "Mantel Rectangular", desc: "Para mesa rectangular", precio: 15, colores: ["Blanco", "Negro", "Rojo", "Otro"] },
+        { id: "mt2", nombre: "Mantel Redondo", desc: "Para mesa redonda", precio: 75, colores: ["Blanco", "Negro", "Otro"] },
+        { id: "mt3", nombre: "Mantel Coctelero", desc: "Para mesa coctelera", precio: 50, colores: ["Blanco", "Otro"] }
+      ]
+    },
+    {
+      id: "sobre-manteles",
+      titulo: "Sobremanteles",
+      nota: "Precio por unidad, por evento",
+      items: [
+        { id: "sm1", nombre: "Sobremantel Rectangular", desc: "Para mesa rectangular", precio: 15, colores: ["Rojo", "Gris", "Verde", "Otro"] },
+        { id: "sm2", nombre: "Sobremantel Redondo", desc: "Para mesa redonda", precio: 25, colores: ["Celeste", "Negro", "Otro"] }
       ]
     }
   ]
