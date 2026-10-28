@@ -115,9 +115,9 @@
       ["Correo", cliente.email],
       ["Evento", cliente.tipo],
       ["Fecha", u.fmtFecha(cliente.fecha)],
+      ["Lugar", cliente.lugar],
       ["Hora de entrega", cliente.horaEntrega ? u.fmtHora(cliente.horaEntrega) : ""],
-      ["Hora del evento", cliente.horaEvento ? u.fmtHora(cliente.horaEvento) : ""],
-      ["Lugar", cliente.lugar]
+      ["Hora del evento", cliente.horaEvento ? u.fmtHora(cliente.horaEvento) : ""]
     ];
 
     var anchoTotalCliente = W - 2 * M;
@@ -332,9 +332,10 @@
     titulo("CLIENTE Y EVENTO");
     y += 0.5;
     var pares = [
-      [["Cliente", cliente.nombre], ["Teléfono", cliente.tel]],
-      [["Fecha", u.fmtFecha(cliente.fecha)], ["Hora del evento", cliente.horaEvento ? u.fmtHora(cliente.horaEvento) : ""]],
-      [["Lugar", cliente.lugar], ["Hora de entrega", cliente.horaEntrega ? u.fmtHora(cliente.horaEntrega) : ""]]
+      [filasCliente[0], filasCliente[1]],
+      [filasCliente[2], filasCliente[3]],
+      [filasCliente[4], filasCliente[5]],
+      [filasCliente[6], filasCliente[7]]
     ];
     var sep = 8, anchoCol = (W - 2 * M - sep) / 2, xCol = [M, M + anchoCol + sep], anchoEtiq = 32;
     doc.setFontSize(9.5);
