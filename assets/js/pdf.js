@@ -331,6 +331,25 @@
     // ---- Cliente y evento (dos columnas, igual que la cotización; sin correo: es un documento interno)
     titulo("CLIENTE Y EVENTO");
     y += 0.5;
+    var filasCliente = [
+      ["Cliente", cliente.nombre],
+      ["Teléfono", cliente.tel],
+      ["Correo", cliente.email],
+      ["Evento", cliente.tipo],
+      ["Fecha", u.fmtFecha(cliente.fecha)],
+      ["Lugar", cliente.lugar],
+      ["Hora de entrega", cliente.horaEntrega ? u.fmtHora(cliente.horaEntrega) : ""],
+      ["Hora del evento", cliente.horaEvento ? u.fmtHora(cliente.horaEvento) : ""]
+    ];
+
+    var anchoTotalCliente = W - 2 * M;
+    var separacionCliente = 8;
+    var anchoColCliente = (anchoTotalCliente - separacionCliente) / 2;
+    var xColCliente = [M, M + anchoColCliente + separacionCliente];
+    var anchoEtiqueta = 32;
+    var altoLineaCliente = 4.6;
+    doc.setFontSize(9.5);
+
     var pares = [
       [filasCliente[0], filasCliente[1]],
       [filasCliente[2], filasCliente[3]],
