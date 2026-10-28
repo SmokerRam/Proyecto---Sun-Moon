@@ -14,8 +14,8 @@
 
   // Paleta oficial del Flyer Promo: azul marino #02033C, lavanda #807F9E y degradado del logo.
   var COLOR = {
-    ink:  [2, 3, 60],
-    sun:  [218, 116, 42],       // #DA742A, naranja profundo (texto sobre blanco)
+    ink: [2, 3, 60],
+    sun: [218, 116, 42],       // #DA742A, naranja profundo (texto sobre blanco)
     sunBright: [255, 168, 42],  // #FFA82A
     sunLight: [255, 204, 34],   // #FFCC22
     moon: [2, 3, 60],           // títulos de sección en azul marino
@@ -106,29 +106,55 @@
 
     encabezado();
 
-    // ---- Cliente y evento
+    // ---- Cliente y evento (dos columnas)
     titulo("CLIENTE Y EVENTO");
     y += 0.5;
-    var filas = [
+    var filasCliente = [
       ["Cliente", cliente.nombre],
       ["Teléfono", cliente.tel],
       ["Correo", cliente.email],
       ["Evento", cliente.tipo],
       ["Fecha", u.fmtFecha(cliente.fecha)],
-      ["Hora de entrega", cliente.horaEntrega ? u.fmtHora(cliente.horaEntrega) : ""],
       ["Hora del evento", cliente.horaEvento ? u.fmtHora(cliente.horaEvento) : ""],
-      ["Lugar", cliente.lugar]
-    ].filter(function (f) { return f[1]; }); // omite las filas de campos que no existen o están vacíos
-    doc.setFontSize(10);
-    filas.forEach(function (f) {
-      doc.setFont("helvetica", "bold"); color("setTextColor", COLOR.gray);
-      doc.text(f[0], M, y);
-      doc.setFont("helvetica", "normal"); color("setTextColor", COLOR.ink);
-      var texto = doc.splitTextToSize(f[1], W - 2 * M - 34);
-      doc.text(texto, M + 34, y);
-      y += 5.5 * texto.length;
+      ["Lugar", cliente.lugar],
+      ["Hora de entrega", cliente.horaEntrega ? u.fmtHora(cliente.horaEntrega) : ""]
+    ];
+
+    var anchoTotalCliente = W - 2 * M;
+    var separacionCliente = 8;
+    var anchoColCliente = (anchoTotalCliente - separacionCliente) / 2;
+    var xColCliente = [M, M + anchoColCliente + separacionCliente];
+    var anchoEtiqueta = 25;
+    var altoLineaCliente = 4.6;
+    doc.setFontSize(9.5);
+
+    // Cada fila visual contiene dos datos. Si algún dato está vacío, se omite sin
+    // desplazar el resto de las etiquetas ni afectar los datos usados por el PDF.
+    var paresCliente = [
+      [filasCliente[0], filasCliente[1]],
+      [filasCliente[2], filasCliente[3]],
+      [filasCliente[4], filasCliente[5]],
+      [filasCliente[6], filasCliente[7]]
+    ];
+
+    paresCliente.forEach(function (par) {
+      var alturas = [0, 0];
+      par.forEach(function (f, indice) {
+        if (!f || !f[1]) { return; }
+        var anchoValor = anchoColCliente - anchoEtiqueta - 3;
+        doc.setFont("helvetica", "normal");
+        var texto = doc.splitTextToSize(String(f[1]), anchoValor);
+        alturas[indice] = texto.length;
+        doc.setFont("helvetica", "bold");
+        color("setTextColor", COLOR.gray);
+        doc.text(f[0], xColCliente[indice], y);
+        doc.setFont("helvetica", "normal");
+        color("setTextColor", COLOR.ink);
+        doc.text(texto, xColCliente[indice] + anchoEtiqueta, y);
+      });
+      y += altoLineaCliente * Math.max(1, alturas[0], alturas[1]) + 1.2;
     });
-    y += 6;
+    y += 3;
 
     // ---- Tabla de artículos
     encabezadoTabla();
@@ -145,12 +171,19 @@
       doc.setFont("helvetica", "normal"); doc.setFontSize(10);
       color("setTextColor", COLOR.ink);
       doc.text(l.nombre, M + 2, y);
+      if (l.color) {
+        doc.setFont("helvetica", "normal"); doc.setFontSize(8);
+        color("setTextColor", COLOR.gray);
+        doc.text("Color: " + l.color, M + 2, y + 4);
+      }
+      doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+      color("setTextColor", COLOR.ink);
       doc.text(String(l.cant), 118, y, { align: "right" });
       doc.text(u.money(l.precio), 152, y, { align: "right" });
       doc.text(u.money(l.sub), W - M - 2, y, { align: "right" });
       color("setDrawColor", COLOR.line);
-      doc.line(M, y + 2.4, W - M, y + 2.4);
-      y += 7;
+      doc.line(M, y + (l.color ? 6.4 : 2.4), W - M, y + (l.color ? 6.4 : 2.4));
+      y += l.color ? 11 : 7;
     });
 
     // ---- Total
@@ -182,9 +215,9 @@
     doc.setFont("helvetica", "normal"); doc.setFontSize(9);
     color("setTextColor", COLOR.gray);
     [
-      "Los costos especificados en esta cotización ya incluyen impuestos y envío al lugar de entrega.",
-      "Se debe cancelar el 50% de la totalidad del evento por medio de transferencia bancaria, para reservar su mobiliario.",
-      "Si se presenta algún daño (quemadura, quiebre, rajadura u otros) en el mobiliario y equipo entregado se cobrará 10 veces el valor del alquiler."
+      "Precios por evento, en quetzales. No incluyen flete de entrega y recogida.",
+      "Cotización válida hasta el " + vence + ". Sujeta a disponibilidad en la fecha del evento.",
+      "El mobiliario se reserva al confirmar con " + cfg.negocio + "."
     ].forEach(function (t) {
       var s = doc.splitTextToSize("• " + t, W - 2 * M);
       doc.text(s, M, y);
