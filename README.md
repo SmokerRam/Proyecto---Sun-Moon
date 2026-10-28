@@ -1,10 +1,10 @@
 # Sun&Moon Eventos · Cotizador de mobiliario
 
-Landing page para que los clientes cotizen el alquiler de sillas, mesas, toldos y otros artículos para su evento, y descarguen la cotización en PDF al momento. Es un sitio estático (HTML, CSS y JavaScript), sin servidor ni proceso de compilación.
+Landing page para que los clientes cotizen el alquiler de sillas, mesas, toldos y otros artículos para su evento, y descarguen la cotización en PDF al momento. Es un sitio estático (HTML, CSS y JavaScript, sin compilación) que se publica en Cloudflare Workers; un Worker mínimo reenvía el envío por correo a Google Apps Script.
 
 ## Funciones
 
-- Catálogo por categorías (sillas, mesas, toldos y otros artículos) con precio fijo por evento.
+- Catálogo por categorías desplegables (sillas, mesas, toldos y otros artículos) con precio fijo por evento. Los artículos con `colores` en `config.js` (los manteles) piden elegir color, o escribir otro, y se muestra en la cotización y en el acta.
 - Formulario con nombre, teléfono, fecha, **hora de entrega**, **hora del evento**, tipo de evento, lugar y notas. La hora de entrega debe ser anterior a la del evento.
 - Total calculado en tiempo real.
 - PDF de cotización generado en el navegador con [jsPDF](https://github.com/parallax/jsPDF).
@@ -19,6 +19,8 @@ Landing page para que los clientes cotizen el alquiler de sillas, mesas, toldos 
 ```
 sun-moon-eventos/
 ├── index.html                  # Estructura de la página
+├── worker/
+│   └── index.js                # Worker de Cloudflare: sirve el sitio y reenvía POST /api/cotizar
 ├── apps-script/
 │   └── Code.gs                 # Script de Google que envía la cotización por correo
 ├── assets/
@@ -35,6 +37,8 @@ sun-moon-eventos/
 │   │   └── favicon.png         # Icono de la pestaña (remolino del logo)
 │   └── vendor/
 │       └── jspdf.umd.min.js    # jsPDF 2.5.2 (MIT), incluido localmente
+├── wrangler.jsonc              # Configuración del Worker (nombre, dominios, assets)
+├── .assetsignore               # Archivos del repo que no se publican en el sitio
 ├── .gitignore
 └── README.md
 ```
@@ -43,12 +47,14 @@ Los scripts se cargan en este orden y comparten el espacio `window.SunMoon`: `co
 
 ## Uso local
 
-Abre `index.html` en el navegador. Para probarlo con un servidor local:
+Para ver la página y el PDF basta un servidor estático (el envío por correo no funcionará, porque `/api/cotizar` solo existe en el Worker):
 
 ```bash
 python3 -m http.server 8000
 # luego abre http://localhost:8000
 ```
+
+Para probar también el Worker en local, crea un archivo `.dev.vars` (no se sube a Git) con `APPS_SCRIPT_URL=...` y, si usas clave, `SCRIPT_TOKEN=...`, y ejecuta `npx wrangler dev`.
 
 Las tipografías (Google Fonts) necesitan internet. Sin conexión, la página usa tipografías del sistema.
 
@@ -61,7 +67,7 @@ Todo lo que cambia de un negocio a otro está en `assets/js/config.js`:
 | `negocio` | Nombre que aparece en el PDF y en el mensaje de WhatsApp |
 | `whatsapp` | Número con código de país, sin `+` ni espacios (ejemplo: `50255551234`) |
 | `telefonoVisible`, `correoVisible` | Contacto mostrado en el pie y en el PDF |
-| `envioCorreo.url` | URL de la aplicación web de Google Apps Script. Vacía = no se envía correo y el campo de correo no aparece |
+| `envioCorreo.url` | Ruta del envío por correo (`/api/cotizar`, la del Worker). Vacía = no se envía correo y el campo de correo no aparece |
 | `validezDias` | Días de vigencia de la cotización |
 | `grupos` | Categorías y artículos con su precio por evento |
 
@@ -85,34 +91,40 @@ La página tiene dos botones: **Generar cotización** y **Enviar por WhatsApp**.
 
 - Se envía una **copia al negocio** con los datos del cliente, los artículos y el PDF. Llega siempre.
 - Si el cliente escribió su correo (campo opcional), se le envía **también a él** el PDF.
+- Al correo del negocio se adjunta además el **acta de entrega y devolución** (PDF con el mismo estilo, solo con los artículos de la cotización, columna de color y espacios para nombre, firma y DPI de quien recibe y de quien devuelve). Es un documento interno: **no se descarga ni se envía al cliente**.
 
 Si el PDF se descarga pero el correo falla, la página lo avisa y le sugiere escribir por WhatsApp.
 
-No usa servidores propios: la página envía los datos a un script de Google Apps Script que publica el Gmail del negocio, y ese script manda los correos desde esa cuenta. Es gratis y no necesita dominio.
+Cómo funciona: el navegador envía la cotización (datos y PDF) a `/api/cotizar`, en el mismo dominio de la página. El Worker ([`worker/index.js`](worker/index.js)) la valida y la reenvía a un script de Google Apps Script, que manda los correos desde el Gmail del negocio. Es gratis y no necesita dominio propio para el correo. Que el navegador solo hable con su propio dominio evita los bloqueos entre sitios de Safari en iPhone, y la URL del script queda como secreto en Cloudflare en vez de estar en el código público.
 
-### Instalación (una sola vez, unos 10 minutos)
+### Instalación (una sola vez)
+
+**1. Google Apps Script**
 
 1. Entra a [script.google.com](https://script.google.com) con el **Gmail del negocio** (los correos saldrán desde esa cuenta) y crea un **Proyecto nuevo**.
-2. Borra el contenido de `Code.gs` y pega el de [`apps-script/Code.gs`](apps-script/Code.gs). Revisa el bloque `CONFIG` de arriba: nombre del negocio, teléfono y, si quieres que la copia llegue a otro correo, `CORREO_COPIA`. Guarda.
-3. Clic en **Implementar → Nueva implementación**. En el engranaje elige **Aplicación web** y configura:
-   - **Ejecutar como:** Yo
-   - **Quién tiene acceso:** Cualquier persona
-4. Clic en **Implementar** y autoriza los permisos. Si Google avisa que la app no está verificada, elige **Avanzado → Ir a (nombre del proyecto)**; es tu propio script.
-5. Copia la **URL de la aplicación web** (termina en `/exec`). Ábrela en el navegador: debe mostrar `{"ok":true,...}`.
-6. Pégala en `assets/js/config.js`, en `envioCorreo.url`, y sube el cambio. Al recargar la página aparece el campo de correo (opcional). Mientras la URL esté vacía, ese campo no se muestra y el botón solo descarga el PDF.
+2. Borra el contenido de `Code.gs` y pega el de [`apps-script/Code.gs`](apps-script/Code.gs). Revisa el bloque `CONFIG`: nombre del negocio, teléfono y, si quieres que la copia llegue a otro correo, `CORREO_COPIA`. Guarda.
+3. **Implementar → Nueva implementación → Aplicación web**, con **Ejecutar como: Yo** y **Quién tiene acceso: Cualquier persona**. Autoriza los permisos (si Google avisa que la app no está verificada: **Avanzado → Ir a (proyecto)**; es tu propio script).
+4. Copia la **URL de la aplicación web** (termina en `/exec`). Ábrela en el navegador: debe mostrar `{"ok":true,...}`.
 
-Si más adelante cambias `Code.gs`, usa **Implementar → Administrar implementaciones → editar → Nueva versión**. La URL no cambia.
+**2. Cloudflare (Worker)**
+
+1. En el Worker, **Configuración → Variables y secretos → Agregar**, tipo **Secreto**: `APPS_SCRIPT_URL` con la URL del paso anterior. Si no existe, el Worker responde "El envío por correo no está configurado".
+2. (Recomendado) Agrega otro secreto `SCRIPT_TOKEN` con una clave larga y aleatoria, y en Apps Script, **Configuración del proyecto → Propiedades del script**, crea `TOKEN` con el mismo valor. Así el script rechaza cualquier solicitud que no venga del Worker, aunque alguien conozca su URL.
+3. Los secretos se mantienen entre despliegues. Si cambias `Code.gs`, usa **Implementar → Administrar implementaciones → editar → Nueva versión** (la URL no cambia).
+
+El nombre del Worker en `wrangler.jsonc` debe coincidir con el del Worker en Cloudflare, y `assets.run_worker_first` hace que solo `/api/*` pase por el código; el resto son archivos estáticos. `.assetsignore` evita publicar el código del Worker, el script de Google y el README.
 
 ### Qué hay que saber
 
 - Los correos salen desde el Gmail que publicó el script, con el nombre "Sun&Moon Eventos". Pueden caer en spam la primera vez; pide a los clientes que revisen esa carpeta.
-- Gmail limita los envíos diarios (cerca de 100 destinatarios al día en cuentas gratuitas). Cada cotización usa 2 (cliente y copia), y el script se detiene en `MAX_COTIZACIONES_DIA` (40 por defecto) para no agotar la cuota.
-- La URL del script queda a la vista en el código de la página. Para que no sirva para enviar spam, el correo al cliente usa una plantilla fija, se valida el correo y el PDF, y hay un campo trampa para bots y el tope diario. Si empiezan a llegar envíos falsos, se puede agregar Cloudflare Turnstile.
-- Con un dominio propio se puede cambiar a Resend para enviar desde `cotizaciones@tudominio.com`. Solo cambia la parte del envío, no la página.
+- Gmail limita los envíos diarios (cerca de 100 destinatarios al día en cuentas gratuitas). Cada cotización usa 2 (cliente y copia), y el script se detiene en `MAX_COTIZACIONES_DIA` (40 por defecto).
+- Protecciones: el Worker solo acepta POST desde su propio dominio, limita el tamaño y no devuelve detalles internos; el script usa plantilla fija para el cliente, valida correo y PDF, tiene campo trampa para bots, tope diario y la clave opcional `TOKEN`. Si aun así llegan envíos falsos, se puede agregar Cloudflare Turnstile.
+- Si una URL anterior del script estuvo en el historial de Git, ya no es secreta: define `TOKEN` o crea una implementación nueva del script y actualiza `APPS_SCRIPT_URL`.
+- Con un dominio verificado se puede cambiar a Resend para enviar desde `cotizaciones@tudominio.com`. Solo cambia el Worker y el script, no la página.
 
 ## Limitaciones actuales
 
-- Sin la URL de Apps Script en `config.js`, el PDF solo se descarga en el dispositivo del cliente.
+- Si el Worker no tiene `APPS_SCRIPT_URL`, el PDF se descarga pero el correo no se envía y la página lo avisa.
 - WhatsApp no permite adjuntar el PDF por enlace, así que el cliente debe adjuntarlo manualmente.
 - La página no consulta disponibilidad de inventario por fecha.
 

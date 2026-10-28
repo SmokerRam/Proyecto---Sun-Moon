@@ -83,6 +83,24 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:16p
 .stepper input{width:56px;height:40px;text-align:center;border:0;background:none;font-weight:600;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
+/* Categorías desplegables del catálogo */
+.group{overflow:hidden}
+.group-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;border:0;background:transparent;color:var(--ink);text-align:left;cursor:pointer}
+.group-toggle:hover{background:var(--surface-2)}
+.group-heading{display:grid;gap:3px;min-width:0}
+.group-title{font-family:var(--font-display);font-size:1.2rem;font-weight:800}
+.group-toggle small{color:var(--muted);font-size:.82rem;font-weight:400}
+.group-chevron{font-size:1.6rem;line-height:1;transition:transform .18s ease}
+.group-toggle[aria-expanded="true"] .group-chevron{transform:rotate(180deg)}
+.group .items[hidden]{display:none}
+.group .items{padding:0 14px 14px}
+.item-options{display:grid;gap:5px;margin-top:10px;max-width:280px}
+.item-options label{font-size:.8rem;font-weight:600;color:var(--muted)}
+.item-options select,.item-options input{width:100%;min-width:0;border:1.5px solid var(--line);border-radius:9px;background:var(--field);padding:9px 10px;color:var(--ink);font:inherit;font-size:.9rem}
+.item-options [hidden]{display:none}
+.item-options [aria-invalid="true"]{border-color:var(--danger)}
+.group-toggle:focus-visible,.item-options select:focus-visible,.item-options input:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+
 /* Summary */
 aside.quote{position:sticky;top:16px;background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--sun);border-radius:20px;padding:22px;display:grid;gap:18px;min-width:0;box-shadow:0 10px 30px rgba(2,3,60,.18)}
 aside.quote h2{font-size:1.4rem}

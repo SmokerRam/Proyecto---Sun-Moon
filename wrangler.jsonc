@@ -1,0 +1,27 @@
+{
+  // Configuración del Worker de Sun&Moon Eventos en Cloudflare.
+  // El nombre debe coincidir con el del Worker que ya está publicado.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sun-moon-eventosgt",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-27",
+  "observability": { "enabled": true },
+
+  // La página es estática y se sirve directo desde Cloudflare. Solo las rutas /api/* pasan por el Worker.
+  // Los archivos que NO deben publicarse están listados en .assetsignore.
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+
+  // Dominios propios conectados a este Worker.
+  "routes": [
+    { "pattern": "sun-moongt.com", "custom_domain": true },
+    { "pattern": "www.sun-moongt.com", "custom_domain": true }
+  ]
+
+  // Secretos (no se escriben aquí, se crean en el panel de Cloudflare):
+  //   APPS_SCRIPT_URL  URL de la aplicación web de Google Apps Script (termina en /exec)
+  //   SCRIPT_TOKEN     Clave opcional compartida con apps-script/Code.gs
+}

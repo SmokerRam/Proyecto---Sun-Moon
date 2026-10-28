@@ -14,11 +14,12 @@ window.SunMoon.config = {
   telefonoVisible: "+502 5934 4700",
   correoVisible: "sun.moon.eventosgt@gmail.com",
 
-  // Envío de la cotización por correo (Google Apps Script, ver apps-script/Code.gs y el README).
-  // Pega aquí la URL de la aplicación web que termina en /exec.
-  // Mientras esté vacío, el botón "Enviar cotización por correo" no aparece.
+  // Envío de la cotización por correo. La página llama a /api/cotizar (el Worker de Cloudflare de este
+  // mismo sitio, ver worker/index.js), que lo reenvía a Google Apps Script (apps-script/Code.gs).
+  // La URL del script ya no va aquí: se guarda como secreto APPS_SCRIPT_URL en Cloudflare.
+  // Si dejas la url vacía, no se envía correo y el campo de correo no aparece (solo se descarga el PDF).
   envioCorreo: {
-    url: "https://script.google.com/macros/s/AKfycbxGrWJ3SYqh3_9BWcen3jh0JcpQK7M47db0mEZuKK2Vw4I80l24F74B6ooo8A4QjrMi8Q/exec"
+    url: "/api/cotizar"
   },
 
   validezDias: 7,
@@ -60,9 +61,9 @@ window.SunMoon.config = {
       titulo: "Otros artículos",
       nota: "Precio por unidad, por evento",
       items: [
-        { id: "o1", nombre: "Mantel Rectangular", desc: "Para mesa rectangular", precio: 15 },
-        { id: "o2", nombre: "Mantel Redondo", desc: "Para mesa redonda", precio: 75 },
-        { id: "o3", nombre: "Mantel Coctelero", desc: "Para mesa coctelera", precio: 50 }
+        { id: "o1", nombre: "Mantel Rectangular", desc: "Para mesa rectangular", precio: 15, colores: ["Blanco", "Negro", "Rojo", "Azul", "Rosado", "Dorado", "Plateado", "Verde", "Beige", "Otro"] },
+        { id: "o2", nombre: "Mantel Redondo", desc: "Para mesa redonda", precio: 75, colores: ["Blanco", "Negro", "Rojo", "Azul", "Rosado", "Dorado", "Plateado", "Verde", "Beige", "Otro"] },
+        { id: "o3", nombre: "Mantel Coctelero", desc: "Para mesa coctelera", precio: 50, colores: ["Blanco", "Negro", "Rojo", "Azul", "Rosado", "Dorado", "Plateado", "Verde", "Beige", "Otro"] }
       ]
     }
   ]
