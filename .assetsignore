@@ -1,0 +1,11 @@
+# Archivos del repositorio que NO se publican en el sitio web.
+wrangler.jsonc
+.assetsignore
+worker
+apps-script
+README.md
+.gitignore
+.git
+.wrangler
+.dev.vars
+node_modules

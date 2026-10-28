@@ -6,11 +6,15 @@
  *   2. envía siempre una copia con los datos del evento y el PDF al negocio,
  *   3. si el cliente dejó su correo, le envía también el PDF desde el Gmail que publique el script.
  *
+ * Cada correo al negocio lleva también el acta de entrega y devolución (PDF para imprimir y firmar);
+ * el cliente solo recibe la cotización.
+ *
  * Instalación: ver la sección "Envío por correo" del README.md.
  *
- * Como la dirección del script es pública, el correo que se envía al cliente usa una
- * plantilla fija (nadie puede mandar texto libre), hay un tope diario de envíos y se
- * limitan el tamaño del PDF y el largo de cada campo.
+ * La página no llama a este script directamente: lo hace el Worker de Cloudflare (worker/index.js).
+ * Aun así, la dirección del script puede filtrarse, así que el correo que se envía al cliente usa una
+ * plantilla fija (nadie puede mandar texto libre), hay un tope diario de envíos, se limitan el
+ * tamaño del PDF y el largo de cada campo, y se puede exigir una clave (propiedad TOKEN).
  */
 
 var CONFIG = {
@@ -62,6 +66,11 @@ function leerDatos_(e) {
   if (!e || !e.postData || !e.postData.contents) { throw new Error("Solicitud vacía."); }
   var raw = JSON.parse(e.postData.contents);
 
+  // Clave opcional compartida con el Worker de Cloudflare. Si defines la propiedad TOKEN del script
+  // (Configuración del proyecto > Propiedades del script), solo se aceptan solicitudes que la traigan.
+  var esperado = PropertiesService.getScriptProperties().getProperty("TOKEN");
+  if (esperado && String(raw.token || "") !== esperado) { throw new Error("No autorizado."); }
+
   var d = {
     hp: texto_(raw.hp, 100),
     nombre: texto_(raw.nombre, 80),
@@ -76,7 +85,10 @@ function leerDatos_(e) {
     total: texto_(raw.total, 20),
     resumen: Array.isArray(raw.resumen) ? raw.resumen.slice(0, 40).map(function (l) { return texto_(l, 120); }) : [],
     pdfNombre: texto_(raw.pdfNombre, 60),
-    pdfBase64: String(raw.pdfBase64 || "")
+    pdfBase64: String(raw.pdfBase64 || ""),
+    // Acta de entrega y devolución (opcional): solo se adjunta al correo del negocio.
+    actaNombre: texto_(raw.actaNombre, 60),
+    actaBase64: String(raw.actaBase64 || "")
   };
 
   if (d.hp) { return d; }
@@ -88,6 +100,11 @@ function leerDatos_(e) {
 
   if (!d.pdfBase64 || d.pdfBase64.length > CONFIG.MAX_PDF_BYTES * 1.4) { throw new Error("El PDF falta o es demasiado grande."); }
   if (!/^[A-Za-z0-9+\/=]+$/.test(d.pdfBase64)) { throw new Error("El PDF no es válido."); }
+
+  if (!/^Entrega-Devolucion-[A-Za-z0-9-]+\.pdf$/.test(d.actaNombre)) { d.actaNombre = "Entrega-Devolucion.pdf"; }
+  if (d.actaBase64 && (d.actaBase64.length > CONFIG.MAX_PDF_BYTES * 1.4 || !/^[A-Za-z0-9+\/=]+$/.test(d.actaBase64))) {
+    d.actaBase64 = ""; // un acta dañada no impide enviar la cotización
+  }
 
   return d;
 }
@@ -116,6 +133,12 @@ function enviarCorreos_(d) {
   var pdf = Utilities.newBlob(Utilities.base64Decode(d.pdfBase64), "application/pdf", d.pdfNombre);
   if (pdf.getBytes().length > CONFIG.MAX_PDF_BYTES) { throw new Error("El PDF es demasiado grande."); }
 
+  var acta = null;
+  if (d.actaBase64) {
+    acta = Utilities.newBlob(Utilities.base64Decode(d.actaBase64), "application/pdf", d.actaNombre);
+    if (acta.getBytes().length > CONFIG.MAX_PDF_BYTES) { acta = null; }
+  }
+
   var propio = Session.getEffectiveUser().getEmail();
   var copia = CONFIG.CORREO_COPIA || propio;
 
@@ -143,7 +166,7 @@ function enviarCorreos_(d) {
       (d.resumen.length ? "Artículos:\n" + d.resumen.join("\n") + "\n\n" : "") +
       "Total estimado: " + d.total + "\n" +
       (d.notas ? "\nNotas del cliente: " + d.notas + "\n" : ""),
-    attachments: [pdf]
+    attachments: acta ? [pdf, acta] : [pdf]
   };
   if (d.email) { aviso.replyTo = d.email; }
   MailApp.sendEmail(aviso);

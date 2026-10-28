@@ -7,6 +7,7 @@
 
   var cfg = SM.config, u = SM.utils;
   var qty = {};
+  var colores = {};
   var items = [];
 
   function $(id) { return document.getElementById(id); }
@@ -32,25 +33,40 @@
     cfg.grupos.forEach(function (g) {
       var sec = document.createElement("section");
       sec.className = "group";
-      sec.innerHTML = "<h2>" + g.titulo + " <small>" + g.nota + "</small></h2><div class=\"items\"></div>";
+      sec.innerHTML =
+        "<button class=\"group-toggle\" type=\"button\" aria-expanded=\"" + (cat.children.length === 0 ? "true" : "false") + "\">" +
+          "<span class=\"group-heading\"><span class=\"group-title\">" + g.titulo + "</span>" +
+          "<small>" + g.nota + "</small></span><span class=\"group-chevron\" aria-hidden=\"true\">⌄</span>" +
+        "</button><div class=\"items\"" + (cat.children.length === 0 ? "" : " hidden") + "></div>";
+      var toggle = sec.querySelector(".group-toggle");
       var caja = sec.querySelector(".items");
+      toggle.addEventListener("click", function () {
+        var abierto = toggle.getAttribute("aria-expanded") === "true";
+        toggle.setAttribute("aria-expanded", abierto ? "false" : "true");
+        caja.hidden = abierto;
+      });
 
       g.items.forEach(function (it) {
         var fila = document.createElement("div");
         fila.className = "item";
         fila.id = "row-" + it.id;
+        var opcionesColor = "";
+        if (Array.isArray(it.colores) && it.colores.length) {
+          colores[it.id] = { valor: "", otro: "" };
+          opcionesColor = "<div class=\"item-options\"><label for=\"color-" + it.id + "\">Color del mantel</label>" +
+            "<select id=\"color-" + it.id + "\" data-color-id=\"" + it.id + "\"><option value=\"\">Selecciona un color</option>" +
+            it.colores.map(function (c) { return "<option value=\"" + c + "\">" + c + "</option>"; }).join("") +
+            "</select><input class=\"color-other\" id=\"otro-color-" + it.id + "\" data-other-id=\"" + it.id + "\" type=\"text\" maxlength=\"40\" placeholder=\"Escribe el color que necesitas\" aria-label=\"Otro color para " + it.nombre + "\" hidden></div>";
+        }
         fila.innerHTML =
-          "<div>" +
-          "<div class=\"nm\">" + it.nombre + "</div>" +
-          "<div class=\"ds\">" + it.desc + "</div>" +
+          "<div class=\"item-info\"><div class=\"nm\">" + it.nombre + "</div>" +
+          "<div class=\"ds\">" + it.desc + "</div>" + opcionesColor +
           "<div class=\"pr\"><strong>" + u.money(it.precio) + "</strong> c/u · subtotal " +
-          "<span id=\"sub-" + it.id + "\">" + u.money(0) + "</span></div>" +
-          "</div>" +
+          "<span id=\"sub-" + it.id + "\">" + u.money(0) + "</span></div></div>" +
           "<div class=\"stepper\" role=\"group\" aria-label=\"Cantidad de " + it.nombre + "\">" +
           "<button type=\"button\" data-id=\"" + it.id + "\" data-d=\"-1\" aria-label=\"Quitar uno\">−</button>" +
           "<input id=\"q-" + it.id + "\" type=\"number\" min=\"0\" max=\"9999\" inputmode=\"numeric\" value=\"0\" aria-label=\"Cantidad\">" +
-          "<button type=\"button\" data-id=\"" + it.id + "\" data-d=\"1\" aria-label=\"Agregar uno\">+</button>" +
-          "</div>";
+          "<button type=\"button\" data-id=\"" + it.id + "\" data-d=\"1\" aria-label=\"Agregar uno\">+</button></div>";
         caja.appendChild(fila);
       });
 
@@ -65,6 +81,20 @@
     cat.addEventListener("input", function (e) {
       if (e.target.matches("input[id^=q-]")) {
         setCantidad(e.target.id.slice(2), e.target.value);
+      } else if (e.target.matches("input[data-other-id]")) {
+        var otroId = e.target.getAttribute("data-other-id");
+        colores[otroId].otro = e.target.value.trim();
+        render();
+      }
+    });
+    cat.addEventListener("change", function (e) {
+      if (e.target.matches("select[data-color-id]")) {
+        var colorId = e.target.getAttribute("data-color-id");
+        colores[colorId].valor = e.target.value;
+        var otro = $("otro-color-" + colorId);
+        otro.hidden = e.target.value !== "Otro";
+        if (e.target.value !== "Otro") { colores[colorId].otro = ""; otro.value = ""; }
+        render();
       }
     });
   }
@@ -86,6 +116,7 @@
           nombre: it.nombre,
           cant: qty[it.id],
           precio: it.precio,
+          color: colores[it.id] ? (colores[it.id].valor === "Otro" ? colores[it.id].otro : colores[it.id].valor) : "",
           sub: qty[it.id] * it.precio
         };
       });
@@ -101,13 +132,25 @@
     items.forEach(function (it) {
       $("sub-" + it.id).textContent = u.money(qty[it.id] * it.precio);
       $("row-" + it.id).classList.toggle("on", qty[it.id] > 0);
+      if (colores[it.id]) {
+        var selectColor = $("color-" + it.id);
+        var otroColor = $("otro-color-" + it.id);
+        if (selectColor) { selectColor.value = colores[it.id].valor; }
+        if (otroColor) { otroColor.value = colores[it.id].otro; otroColor.hidden = colores[it.id].valor !== "Otro"; }
+      }
     });
 
     var ul = $("lines");
     ul.innerHTML = sel.length ? "" : "<li class=\"empty\">Aún no has elegido artículos.</li>";
     sel.forEach(function (l) {
       var li = document.createElement("li");
-      li.innerHTML = "<span>" + l.cant + " × " + l.nombre + "</span><span>" + u.money(l.sub) + "</span>";
+      var detalle = l.cant + " × " + l.nombre + (l.color ? " · Color: " + l.color : "");
+      var textoArticulo = document.createElement("span");
+      var textoSubtotal = document.createElement("span");
+      textoArticulo.textContent = detalle;
+      textoSubtotal.textContent = u.money(l.sub);
+      li.appendChild(textoArticulo);
+      li.appendChild(textoSubtotal);
       ul.appendChild(li);
     });
 
@@ -168,6 +211,23 @@
     }
     revisar("lugar", val("lugar").length >= 3, "Indica dónde será el evento.");
 
+    items.forEach(function (it) {
+      if (qty[it.id] > 0 && colores[it.id]) {
+        var seleccion = colores[it.id];
+        var valido = !!seleccion.valor && (seleccion.valor !== "Otro" || !!seleccion.otro);
+        if (!valido) {
+          ok = false;
+          var campoColor = $(seleccion.valor === "Otro" ? "otro-color-" + it.id : "color-" + it.id);
+          if (campoColor) { campoColor.setAttribute("aria-invalid", "true"); if (!primero) { primero = campoColor.id; } }
+          setEstado("Selecciona el color de los manteles que agregaste al cotizador.", "bad");
+        } else {
+          var selColor = $("color-" + it.id), otroColor = $("otro-color-" + it.id);
+          if (selColor) { selColor.removeAttribute("aria-invalid"); }
+          if (otroColor) { otroColor.removeAttribute("aria-invalid"); }
+        }
+      }
+    });
+
     if (seleccionados().length === 0) {
       ok = false;
       setEstado("Elige al menos un artículo para cotizar.", "bad");
@@ -190,7 +250,7 @@
     if (c.lugar) { t += "Lugar: " + c.lugar + "\n"; }
     t += "\n";
     seleccionados().forEach(function (l) {
-      t += "• " + l.cant + " × " + l.nombre + " — " + u.money(l.sub) + "\n";
+      t += "• " + l.cant + " × " + l.nombre + (l.color ? " (Color: " + l.color + ")" : "") + " — " + u.money(l.sub) + "\n";
     });
     t += "\nTotal estimado: " + u.money(total());
     return t;
@@ -266,10 +326,20 @@
         lugar: c.lugar,
         notas: c.notas,
         total: u.money(total()),
-        resumen: lineas.map(function (l) { return l.cant + " × " + l.nombre + " — " + u.money(l.sub); }),
+        resumen: lineas.map(function (l) { return l.cant + " × " + l.nombre + (l.color ? " (Color: " + l.color + ")" : "") + " — " + u.money(l.sub); }),
         pdfNombre: r.nombre,
         pdfBase64: uri.slice(uri.indexOf("base64,") + 7)
       };
+      // Acta de entrega y devolución: documento interno, solo viaja al correo del negocio.
+      // Si falla, la cotización se envía igual.
+      try {
+        var acta = SM.pdf.generarActa({ cliente: c, lineas: lineas, total: total(), numero: r.numero });
+        var uriActa = acta.doc.output("datauristring");
+        payload.actaNombre = acta.nombre;
+        payload.actaBase64 = uriActa.slice(uriActa.indexOf("base64,") + 7);
+      } catch (e2) {
+        if (window.console) { console.error(e2); }
+      }
     } catch (err) {
       if (window.console) { console.error(err); }
       setEstado("Se descargó " + r.nombre + ", pero no se pudo preparar el correo.", "bad");
@@ -281,10 +351,10 @@
     btn.disabled = true;
     setEstado("Se descargó " + r.nombre + ". Enviando correo…", "");
 
-    // text/plain evita la petición previa (preflight) que Apps Script no responde.
+    // La petición va al propio sitio (/api/cotizar), que la reenvía a Google por detrás.
     fetch(cfg.envioCorreo.url, {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
       signal: ctrl ? ctrl.signal : undefined
     })
@@ -324,7 +394,8 @@
   function iniciar() {
     if ($("fecha")) {
       $("fecha").min = u.hoyISO();
-      flatpickr("#fecha", {
+      // Si el calendario no carga (sin internet o CDN bloqueado), queda el campo de texto normal.
+      if (window.flatpickr) flatpickr("#fecha", {
         locale: "es",
         altInput: true,
         altFormat: "d/m/Y",
