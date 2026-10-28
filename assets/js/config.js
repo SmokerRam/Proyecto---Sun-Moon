@@ -39,9 +39,10 @@ window.SunMoon.config = {
       titulo: "Mesas",
       nota: "Precio por mesa, por evento",
       items: [
-        { id: "m1", nombre: "Mesa rectangular", desc: "Para 8 personas", precio: 25 },
-        { id: "m2", nombre: "Mesa redonda", desc: "Para 10 personas", precio: 35 },
-        { id: "m3", nombre: "Mesa alta de cóctel", desc: "Para recepciones", precio: 40 }
+        { id: "m1", nombre: "Mesa rectangular", desc: "Para 8 personas", precio: 35 },
+        { id: "m2", nombre: "Mesa redonda", desc: "Para 10 personas", precio: 75 },     
+        { id: "m4", nombre: "Mesa para niños", desc: "Para 8 niños", precio: 35 },
+        { id: "m3", nombre: "Mesa alta de cóctel", desc: "Para recepciones", precio: 50 }
       ]
     },
     {
@@ -49,7 +50,9 @@ window.SunMoon.config = {
       titulo: "Toldos",
       nota: "Precio por toldo, por evento",
       items: [
-        { id: "t1", nombre: "Toldo 3 × 3 m", desc: "Cubre 1 o 2 mesas", precio: 250 }
+        { id: "t1", nombre: "Toldo 3 × 2 m", desc: "Cubre 1 o 2 mesas", precio: 130 },
+        { id: "t2", nombre: "Toldo 3 × 3 m", desc: "Cubre 2 o 3 mesas", precio: 165 },
+        { id: "t3", nombre: "Toldo 6 × 3 m", desc: "Cubre 3 o 4 mesas", precio: 300 }
       ]
     },
     {
@@ -57,7 +60,9 @@ window.SunMoon.config = {
       titulo: "Otros artículos",
       nota: "Precio por unidad, por evento",
       items: [
-        { id: "o1", nombre: "Mantel", desc: "Para mesa rectangular o redonda", precio: 15 }
+        { id: "o1", nombre: "Mantel Rectangular", desc: "Para mesa rectangular", precio: 15 },
+        { id: "o2", nombre: "Mantel Redondo", desc: "Para mesa redonda", precio: 75 },
+        { id: "o3", nombre: "Mantel Coctelero", desc: "Para mesa coctelera", precio: 50 }
       ]
     }
   ]
