@@ -41,15 +41,15 @@
         fila.id = "row-" + it.id;
         fila.innerHTML =
           "<div>" +
-            "<div class=\"nm\">" + it.nombre + "</div>" +
-            "<div class=\"ds\">" + it.desc + "</div>" +
-            "<div class=\"pr\"><strong>" + u.money(it.precio) + "</strong> c/u · subtotal " +
-              "<span id=\"sub-" + it.id + "\">" + u.money(0) + "</span></div>" +
+          "<div class=\"nm\">" + it.nombre + "</div>" +
+          "<div class=\"ds\">" + it.desc + "</div>" +
+          "<div class=\"pr\"><strong>" + u.money(it.precio) + "</strong> c/u · subtotal " +
+          "<span id=\"sub-" + it.id + "\">" + u.money(0) + "</span></div>" +
           "</div>" +
           "<div class=\"stepper\" role=\"group\" aria-label=\"Cantidad de " + it.nombre + "\">" +
-            "<button type=\"button\" data-id=\"" + it.id + "\" data-d=\"-1\" aria-label=\"Quitar uno\">−</button>" +
-            "<input id=\"q-" + it.id + "\" type=\"number\" min=\"0\" max=\"9999\" inputmode=\"numeric\" value=\"0\" aria-label=\"Cantidad\">" +
-            "<button type=\"button\" data-id=\"" + it.id + "\" data-d=\"1\" aria-label=\"Agregar uno\">+</button>" +
+          "<button type=\"button\" data-id=\"" + it.id + "\" data-d=\"-1\" aria-label=\"Quitar uno\">−</button>" +
+          "<input id=\"q-" + it.id + "\" type=\"number\" min=\"0\" max=\"9999\" inputmode=\"numeric\" value=\"0\" aria-label=\"Cantidad\">" +
+          "<button type=\"button\" data-id=\"" + it.id + "\" data-d=\"1\" aria-label=\"Agregar uno\">+</button>" +
           "</div>";
         caja.appendChild(fila);
       });
@@ -184,10 +184,10 @@
     var c = datosCliente();
     var t = "Hola, quiero cotizar un evento con " + cfg.negocio + ".\n";
     if (c.nombre) { t += "Nombre: " + c.nombre + "\n"; }
-    if (c.fecha)  { t += "Fecha: " + u.fmtFecha(c.fecha) + "\n"; }
+    if (c.fecha) { t += "Fecha: " + u.fmtFecha(c.fecha) + "\n"; }
     if (c.horaEntrega) { t += "Hora de entrega: " + u.fmtHora(c.horaEntrega) + "\n"; }
-    if (c.horaEvento)  { t += "Hora del evento: " + u.fmtHora(c.horaEvento) + "\n"; }
-    if (c.lugar)  { t += "Lugar: " + c.lugar + "\n"; }
+    if (c.horaEvento) { t += "Hora del evento: " + u.fmtHora(c.horaEvento) + "\n"; }
+    if (c.lugar) { t += "Lugar: " + c.lugar + "\n"; }
     t += "\n";
     seleccionados().forEach(function (l) {
       t += "• " + l.cant + " × " + l.nombre + " — " + u.money(l.sub) + "\n";
@@ -322,7 +322,16 @@
 
   // ---------- Inicio ----------
   function iniciar() {
-    if ($("fecha")) { $("fecha").min = u.hoyISO(); }
+    if ($("fecha")) {
+      $("fecha").min = u.hoyISO();
+      flatpickr("#fecha", {
+        locale: "es",
+        altInput: true,
+        altFormat: "d/m/Y",
+        dateFormat: "Y-m-d",
+        minDate: u.hoyISO()
+      });
+    }
     $("contact").textContent = cfg.telefonoVisible + (cfg.correoVisible ? " · " + cfg.correoVisible : "");
     // El correo y su botón solo aparecen cuando config.js tiene la URL del Apps Script.
     $("campo-email").hidden = !correoConfigurado();
