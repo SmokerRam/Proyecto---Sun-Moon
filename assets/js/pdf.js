@@ -182,9 +182,9 @@
     doc.setFont("helvetica", "normal"); doc.setFontSize(9);
     color("setTextColor", COLOR.gray);
     [
-      "Precios por evento, en quetzales. No incluyen flete de entrega y recogida.",
-      "Cotización válida hasta el " + vence + ". Sujeta a disponibilidad en la fecha del evento.",
-      "El mobiliario se reserva al confirmar con " + cfg.negocio + "."
+      "Los costos especificados en esta cotización ya incluyen impuestos y envío al lugar de entrega.",
+      "Se debe cancelar el 50% de la totalidad del evento por medio de transferencia bancaria, para reservar su mobiliario.",
+      "Si se presenta algún daño (quemadura, quiebre, rajadura u otros) en el mobiliario y equipo entregado se cobrará 10 veces el valor del alquiler."
     ].forEach(function (t) {
       var s = doc.splitTextToSize("• " + t, W - 2 * M);
       doc.text(s, M, y);
