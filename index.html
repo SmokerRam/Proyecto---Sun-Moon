@@ -1,18 +1,22 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Sun/Moon Eventos</title>
-  <meta name="description" content="Cotiza el alquiler de sillas, mesas y toldos para tu evento y descarga tu cotización en PDF.">
+  <meta name="description"
+    content="Cotiza el alquiler de sillas, mesas y toldos para tu evento y descarga tu cotización en PDF.">
   <meta name="theme-color" content="#02033C">
   <link rel="icon" type="image/png" href="assets/img/favicon.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
+
 <body>
   <div class="band">
     <div class="wrap">
@@ -27,7 +31,8 @@
       <section class="hero">
         <div>
           <h1>¡Iluminamos tu <mark>evento</mark>!</h1>
-          <p>Alquiler de sillas, mesas, toldos y más. Elige lo que necesitas, indica la fecha, las horas y el lugar, y descarga tu cotización en PDF al momento. Precio fijo por evento.</p>
+          <p>Alquiler de sillas, mesas, toldos y más. Elige lo que necesitas, indica la fecha, las horas y el lugar, y
+            descarga tu cotización en PDF al momento. Precio fijo por evento.</p>
         </div>
         <ol class="steps">
           <li><b>1</b> Elige tu mobiliario</li>
@@ -61,7 +66,8 @@
             </div>
             <div class="field" id="campo-email" hidden>
               <label for="email">Correo electrónico <small>(opcional, para recibir una copia)</small></label>
-              <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="nombre@correo.com">
+              <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
+                placeholder="nombre@correo.com">
               <span class="err" id="e-email"></span>
             </div>
             <!-- Campo trampa para bots: se oculta con CSS y las personas no lo llenan. -->
@@ -99,7 +105,8 @@
             </div>
             <div class="field">
               <label for="lugar">Lugar del evento <i>*</i></label>
-              <textarea id="lugar" name="lugar" autocomplete="street-address" placeholder="Zona, municipio o dirección"></textarea>
+              <textarea id="lugar" name="lugar" autocomplete="street-address"
+                placeholder="Zona, municipio o dirección"></textarea>
               <span class="err" id="e-lugar"></span>
             </div>
             <div class="field">
@@ -117,8 +124,13 @@
           <a class="btn wa" id="btn-wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
         </div>
         <p class="status" id="status" role="status"></p>
-        <p class="note">Los costos especificados en esta cotización ya incluyen impuestos y envió al lugar de entrega.
-          Se debe cancelar el 50% de la totalidad del evento por medio de tranferencia bancaria, para reservar su mobiliario.</p>
+        <div class="note">
+          <ul>
+            <li>Los costos especificados en esta cotización ya incluyen impuestos y envío al lugar de entrega.</li>
+            <li>Se debe cancelar el 50% de la totalidad del evento por medio de transferencia bancaria, para reservar su
+              mobiliario.</li>
+          </ul>
+        </div>
       </aside>
     </main>
 
@@ -138,4 +150,5 @@
   <script src="assets/js/pdf.js" defer></script>
   <script src="assets/js/app.js" defer></script>
 </body>
+
 </html>
