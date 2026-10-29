@@ -20,11 +20,11 @@
     });
   }
 
-  // "15:30" -> "3:30 p. m."
+  // Hora en formato de 24 h, sin AM/PM: "15:30" -> "15:30", "9:05" -> "09:05".
   function fmtHora(hhmm) {
     var p = hhmm.split(":");
-    var d = new Date(2000, 0, 1, +p[0], +p[1]);
-    return d.toLocaleTimeString("es-GT", { hour: "numeric", minute: "2-digit", hour12: true });
+    var z = function (n) { return String(+n || 0).padStart(2, "0"); };
+    return z(p[0]) + ":" + z(p[1]);
   }
 
   // "04 de octubre de 2026"

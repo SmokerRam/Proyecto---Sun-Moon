@@ -101,6 +101,15 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:16p
 .item-options [aria-invalid="true"]{border-color:var(--danger)}
 .group-toggle:focus-visible,.item-options select:focus-visible,.item-options input:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
 
+/* Selector de hora (flatpickr, 24 h): más grande y con las flechas siempre visibles para usarlo con el dedo */
+.flatpickr-calendar.noCalendar{width:230px;border-radius:14px;box-shadow:0 12px 30px rgba(2,3,60,.28)}
+.flatpickr-calendar.noCalendar .flatpickr-time{height:64px;max-height:64px;line-height:64px;border:0}
+.flatpickr-calendar.noCalendar .numInputWrapper{height:64px}
+.flatpickr-calendar.noCalendar .flatpickr-time input{height:64px;font-family:var(--font-display);font-size:1.7rem;font-weight:800;color:var(--navy)}
+.flatpickr-calendar.noCalendar .flatpickr-time .flatpickr-time-separator{line-height:64px;font-size:1.7rem;font-weight:800;color:var(--navy)}
+.flatpickr-calendar.noCalendar .numInputWrapper span{opacity:1;width:26px;padding:0 6px}
+.flatpickr-calendar.noCalendar .flatpickr-time input:focus{background:#FFF1D0}
+
 /* Summary */
 aside.quote{position:sticky;top:16px;background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--sun);border-radius:20px;padding:22px;display:grid;gap:18px;min-width:0;box-shadow:0 10px 30px rgba(2,3,60,.18)}
 aside.quote h2{font-size:1.4rem}
@@ -115,7 +124,8 @@ fieldset{border:0;margin:0;padding:0;display:grid;gap:12px;min-width:0}
 .field textarea{resize:vertical;min-height:64px}
 .field input[aria-invalid="true"]{border-color:var(--danger)}
 .err{color:var(--danger);font-size:.82rem;min-height:0}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.row2 > *{min-width:0}
 .lines{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:.92rem;border-block:1px dashed var(--line);padding-block:12px;min-height:48px}
 .lines li{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
 .lines li span:first-child{min-width:0;overflow-wrap:anywhere}
@@ -142,9 +152,12 @@ fieldset{border:0;margin:0;padding:0;display:grid;gap:12px;min-width:0}
   .hero,.main{grid-template-columns:minmax(0,1fr)}
   aside.quote{position:static}
 }
+@media (max-width:520px){
+  /* iPhone Plus/Pro Max miden ~430 px: con 420 como límite el formulario seguía en dos columnas */
+  .row2{grid-template-columns:minmax(0,1fr)}
+}
 @media (max-width:420px){
   .brand img{height:68px}
-  .row2{grid-template-columns:1fr}
   .item{grid-template-columns:minmax(0,1fr)}
   .stepper{justify-self:start}
 }

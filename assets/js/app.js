@@ -179,6 +179,35 @@
     if (campo) { campo.setAttribute("aria-invalid", msg ? "true" : "false"); }
   }
 
+  // ---------- Campos de hora (24 h) ----------
+  // Un solo campo por hora. <input type="time"> muestra 12 h o 24 h según el teléfono o el navegador de
+  // cada persona y la página no puede forzarlo, así que se usa el selector de hora de flatpickr
+  // (el mismo del calendario): siempre en formato de 24 h, sin AM/PM. El valor queda como "HH:MM".
+  // Si flatpickr no carga (sin internet), el campo pasa a ser el <input type="time"> nativo.
+  function crearRelojes() {
+    ["hentrega", "hevento"].forEach(function (id) {
+      var campo = $(id);
+      if (!campo) { return; }
+      if (!window.flatpickr) { campo.type = "time"; campo.removeAttribute("placeholder"); return; }
+      flatpickr(campo, {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        minuteIncrement: 5,
+        defaultHour: 12,
+        defaultMinute: 0,
+        disableMobile: true,
+        // Al abrir vacío, se muestra 12:00 ya escrito en el campo, para que lo que se ve sea lo que se envía.
+        onOpen: function (seleccion, texto, fp) { if (!seleccion.length) { fp.setDate("12:00", true); } },
+        // Se limpian los avisos de las dos horas: "la entrega debe ser antes del evento" depende de ambas.
+        onChange: function () { setError("hentrega", ""); setError("hevento", ""); $("btn-wa").href = enlaceWhatsApp(); },
+        // También al teclear o usar las flechas dentro del selector, que no siempre disparan onChange.
+        onValueUpdate: function () { $("btn-wa").href = enlaceWhatsApp(); }
+      });
+    });
+  }
+
   function setEstado(texto, clase) {
     var s = $("status");
     s.textContent = texto;
@@ -235,7 +264,16 @@
       setEstado("Revisa los campos marcados.", "bad");
     }
 
-    if (primero) { $(primero).focus(); }
+    if (primero) {
+      var destino = $(primero);
+      var fp = destino && destino._flatpickr;
+      if (fp) {
+        // Fecha y horas: se lleva el campo a la vista sin abrir el selector.
+        (fp.altInput || destino).scrollIntoView({ behavior: "smooth", block: "center" });
+      } else if (destino) {
+        destino.focus();
+      }
+    }
     return ok;
   }
 
@@ -400,9 +438,13 @@
         altInput: true,
         altFormat: "d/m/Y",
         dateFormat: "Y-m-d",
-        minDate: u.hoyISO()
+        minDate: u.hoyISO(),
+        // En celular se usa este mismo calendario en vez del selector nativo: así el campo se ve igual
+        // que los demás (con "dd/mm/aaaa" visible) y no se sale de su columna en iPhone.
+        disableMobile: true
       });
     }
+    crearRelojes();
     $("contact").textContent = cfg.telefonoVisible + (cfg.correoVisible ? " · " + cfg.correoVisible : "");
     // El correo y su botón solo aparecen cuando config.js tiene la URL del Apps Script.
     $("campo-email").hidden = !correoConfigurado();
