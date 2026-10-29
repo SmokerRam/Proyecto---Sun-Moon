@@ -73,8 +73,8 @@ window.SunMoon.config = {
       nota: "Precio por unidad, por evento",
       items: [
         { id: "mt1", nombre: "Mantel Rectangular", desc: "Para mesa rectangular", precio: 15, colores: ["Blanco", "Negro", "Rojo", "Otro"] },
-        { id: "mt2", nombre: "Mantel Redondo", desc: "Para mesa redonda", precio: 75, colores: ["Blanco", "Negro", "Otro"] },
-        { id: "mt3", nombre: "Mantel Coctelero", desc: "Para mesa coctelera", precio: 50, colores: ["Blanco", "Otro"] }
+        { id: "mt2", nombre: "Mantel Redondo", desc: "Para mesa redonda", precio: 25, colores: ["Blanco", "Negro", "Otro"] },
+        { id: "mt3", nombre: "Mantel Coctelero", desc: "Para mesa coctelera", precio: 25, colores: ["Blanco", "Otro"] }
       ]
     },
     {
