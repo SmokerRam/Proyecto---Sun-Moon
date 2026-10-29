@@ -25,6 +25,17 @@ window.SunMoon.config = {
   validezDias: 7,
   moneda: "Q",
 
+  // Carrusel "Conoce nuestro mobiliario". Cada foto apunta a un artículo del catálogo (itemId):
+  // el nombre, la descripción y el precio salen de ahí, así que solo hay que mantener los precios abajo.
+  // Las fotos viven en assets/img/productos/ (formato 4:3, fondo blanco, de preferencia .webp).
+  // Para agregar una, suma una línea; para ocultar el carrusel, deja la lista vacía.
+  galeria: [
+    { itemId: "s1", foto: "assets/img/productos/silla-napoli-blanca.webp", alt: "Silla plástica blanca con respaldo calado" },
+    { itemId: "m1", foto: "assets/img/productos/mesa-plegable.webp", alt: "Mesa rectangular plegable blanca con patas metálicas" },
+    { itemId: "t2", foto: "assets/img/productos/toldo-3x3.webp", alt: "Toldo blanco de 3 por 3 metros" },
+    { itemId: "t3", foto: "assets/img/productos/toldo-6x3.webp", alt: "Toldo blanco de 6 por 3 metros" }
+  ],
+
   // Precios fijos por unidad, por evento.
   grupos: [
     {

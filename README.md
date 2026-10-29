@@ -5,7 +5,7 @@ Landing page para que los clientes cotizen el alquiler de sillas, mesas, toldos 
 ## Funciones
 
 - Catálogo por categorías desplegables (sillas, mesas, toldos y otros artículos) con precio fijo por evento. Los artículos con `colores` en `config.js` (los manteles) piden elegir color, o escribir otro, y se muestra en la cotización y en el acta.
-- Formulario con nombre, teléfono, fecha, **hora de entrega**, **hora del evento**, tipo de evento, lugar y notas. La hora de entrega debe ser anterior a la del evento.
+- Formulario con nombre, teléfono, fecha, **hora de entrega**, **hora del evento**, tipo de evento, lugar y notas. La hora de entrega debe ser anterior a la del evento. Cada hora es un solo campo con selector propio (flatpickr, minutos de 5 en 5) y siempre se muestra en **formato de 24 h** (por ejemplo `15:30`), en el formulario, el PDF, el correo y el mensaje de WhatsApp, sin importar la configuración del teléfono. Se usa flatpickr y no `<input type="time">` porque ese campo nativo cambia entre 12 h y 24 h según el dispositivo y la página no puede forzarlo; si flatpickr no carga (sin internet), el campo pasa a ser el nativo.
 - Total calculado en tiempo real.
 - PDF de cotización generado en el navegador con [jsPDF](https://github.com/parallax/jsPDF).
 - Envío de la cotización por correo, con el PDF adjunto, mediante Google Apps Script y un Gmail del negocio (opcional, ver [Envío por correo](#envío-por-correo)).
