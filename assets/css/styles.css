@@ -65,6 +65,44 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:16p
 .steps li{display:flex;gap:12px;align-items:center;padding:12px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:12px;font-weight:500}
 .steps b{flex:none;display:grid;place-items:center;width:1.8em;height:1.8em;border-radius:50%;background:var(--sun-grad);color:var(--sun-ink);font-family:var(--font-display)}
 
+/* Galería: carrusel de mobiliario */
+.gallery{padding-block:40px 0}
+.gallery[hidden]{display:none}
+.gal-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
+.gal-head h2{font-size:clamp(1.55rem,3.6vw,2.2rem);font-weight:800;letter-spacing:-.02em;color:var(--on-bg)}
+.gal-head p{margin:6px 0 0;max-width:48ch;color:var(--on-bg);opacity:.92}
+.car-ctrl{display:flex;gap:8px;flex:none}
+.car-btn{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-size:1.6rem;line-height:1;padding:0 0 3px;cursor:pointer;transition:background .15s,color .15s,opacity .15s}
+.car-btn svg{display:block;margin:0 0 -3px}
+.car-btn:hover:not([disabled]){background:var(--sun-grad);border-color:transparent;color:var(--sun-ink)}
+.car-btn[disabled]{opacity:.4;cursor:default}
+.car-btn[hidden]{display:none}
+.car-track{position:relative;display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-x:contain;scrollbar-width:none;padding:4px 4px 14px;margin-inline:-4px;scroll-padding-inline:4px}
+.car-track::-webkit-scrollbar{display:none}
+.car-track:focus-visible{outline-offset:-2px;border-radius:20px}
+.slide{flex:0 0 calc((100% - 16px) / 2);scroll-snap-align:start;display:grid;grid-template-rows:auto 1fr;background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(2,3,60,.16);min-width:0}
+/* Las fotos tienen fondo blanco: el recuadro se queda blanco también en modo oscuro. */
+.slide-img{position:relative;aspect-ratio:4/3;background:#fff}
+.slide-img img{display:block;width:100%;height:100%;object-fit:contain}
+.slide-tag{position:absolute;left:14px;top:14px;padding:5px 12px;border-radius:999px;background:var(--navy);color:var(--sun);font-size:.78rem;font-weight:700;letter-spacing:.03em}
+.slide-body{display:grid;gap:4px;align-content:start;padding:16px 18px 18px;border-top:4px solid var(--sun)}
+.slide-body h3{font-size:1.25rem;font-weight:800}
+.slide-desc{margin:0;color:var(--muted);font-size:.92rem}
+.slide-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 14px;margin-top:12px}
+.slide-price{font-family:var(--font-display);font-size:1.45rem;font-weight:800;font-variant-numeric:tabular-nums}
+.slide-price small{font-family:var(--font-body);font-size:.8rem;font-weight:500;color:var(--muted)}
+.slide-cta{border:0;border-radius:999px;padding:10px 18px;background:var(--sun-grad);color:var(--sun-ink);font-weight:700;font-size:.92rem;cursor:pointer}
+.slide-cta:hover{filter:brightness(1.06)}
+.car-dots{display:flex;justify-content:center;gap:2px;margin-top:6px}
+.car-dots[hidden]{display:none}
+.car-dot{position:relative;width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;transition:width .2s}
+.car-dot::before{content:"";position:absolute;inset:8px;border-radius:999px;background:var(--on-bg);opacity:.35;transition:opacity .2s}
+.car-dot[aria-current="true"]{width:42px}
+.car-dot[aria-current="true"]::before{background:var(--sun-grad);opacity:1}
+/* Resaltado del artículo al que salta el carrusel */
+.item.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,100%{box-shadow:0 0 0 0 rgba(255,168,42,0)}25%,60%{box-shadow:0 0 0 4px rgba(255,168,42,.6)}}
+
 /* Main layout */
 .main{display:grid;grid-template-columns:minmax(0,1fr) 392px;gap:28px;align-items:start;padding-block:40px 0}
 .catalog{display:grid;gap:28px;min-width:0}
@@ -142,10 +180,21 @@ fieldset{border:0;margin:0;padding:0;display:grid;gap:12px;min-width:0}
   .hero,.main{grid-template-columns:minmax(0,1fr)}
   aside.quote{position:static}
 }
+@media (max-width:760px){
+  /* Una foto a la vez, dejando asomar la siguiente para invitar a deslizar */
+  .slide{flex-basis:86%}
+  .gal-head{align-items:flex-start;flex-direction:column}
+  .car-ctrl{display:none}
+  .gal-head{position:relative}
+  .gal-head > div:first-child{padding-right:54px}
+  /* En celular se desliza con el dedo; se deja solo el botón de pausa del avance automático */
+  .car-ctrl{display:flex;position:absolute;right:0;top:0}
+  #car-prev,#car-next{display:none}
+}
 @media (max-width:420px){
   .brand img{height:68px}
   .row2{grid-template-columns:1fr}
   .item{grid-template-columns:minmax(0,1fr)}
   .stepper{justify-self:start}
 }
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){html,.car-track{scroll-behavior:auto}*{transition:none!important}.item.flash{animation:none;box-shadow:0 0 0 4px rgba(255,168,42,.6)}}

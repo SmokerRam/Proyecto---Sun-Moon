@@ -4,6 +4,7 @@ Landing page para que los clientes cotizen el alquiler de sillas, mesas, toldos 
 
 ## Funciones
 
+- **Carrusel "Conoce nuestro mobiliario"** con fotos de los productos, su precio y un botón que lleva al artículo en el cotizador. Se desliza con el dedo, tiene flechas, puntos y avance automático (se pausa al tocarlo o al pasar el mouse, y no se mueve solo si el dispositivo pide menos animaciones). Se configura en `galeria` de `config.js`.
 - Catálogo por categorías desplegables (sillas, mesas, toldos y otros artículos) con precio fijo por evento. Los artículos con `colores` en `config.js` (los manteles) piden elegir color, o escribir otro, y se muestra en la cotización y en el acta.
 - Formulario con nombre, teléfono, fecha, **hora de entrega**, **hora del evento**, tipo de evento, lugar y notas. La hora de entrega debe ser anterior a la del evento.
 - Total calculado en tiempo real.
@@ -31,10 +32,12 @@ sun-moon-eventos/
 │   │   ├── utils.js            # Formato de moneda y fechas, número de cotización
 │   │   ├── logo-data.js        # Logo en base64 para el PDF (se genera desde img/logo.png)
 │   │   ├── pdf.js              # Generación del PDF
-│   │   └── app.js              # Catálogo, formulario, validación y eventos
+│   │   ├── app.js              # Catálogo, formulario, validación y eventos
+│   │   └── carousel.js         # Carrusel de fotos del mobiliario
 │   ├── img/
 │   │   ├── logo.png            # Logo oficial Sun & Moon Eventos
-│   │   └── favicon.png         # Icono de la pestaña (remolino del logo)
+│   │   ├── favicon.png         # Icono de la pestaña (remolino del logo)
+│   │   └── productos/          # Fotos del carrusel (4:3, fondo blanco, .webp)
 │   └── vendor/
 │       └── jspdf.umd.min.js    # jsPDF 2.5.2 (MIT), incluido localmente
 ├── wrangler.jsonc              # Configuración del Worker (nombre, dominios, assets)
@@ -43,7 +46,7 @@ sun-moon-eventos/
 └── README.md
 ```
 
-Los scripts se cargan en este orden y comparten el espacio `window.SunMoon`: `config.js`, `utils.js`, `logo-data.js`, jsPDF, `pdf.js`, `app.js`.
+Los scripts se cargan en este orden y comparten el espacio `window.SunMoon`: `config.js`, `utils.js`, `logo-data.js`, jsPDF, `pdf.js`, `app.js`, `carousel.js`.
 
 ## Uso local
 
@@ -69,9 +72,12 @@ Todo lo que cambia de un negocio a otro está en `assets/js/config.js`:
 | `telefonoVisible`, `correoVisible` | Contacto mostrado en el pie y en el PDF |
 | `envioCorreo.url` | Ruta del envío por correo (`/api/cotizar`, la del Worker). Vacía = no se envía correo y el campo de correo no aparece |
 | `validezDias` | Días de vigencia de la cotización |
+| `galeria` | Fotos del carrusel: `itemId` (artículo del catálogo, de donde salen nombre y precio), `foto` y `alt` |
 | `grupos` | Categorías y artículos con su precio por evento |
 
 Para agregar un artículo, añade un objeto a la lista `items` del grupo correspondiente con un `id` único, `nombre`, `desc` y `precio`.
+
+Para agregar una foto al carrusel, guárdala en `assets/img/productos/` (recomendado: 1200 × 900 px, producto centrado sobre fondo blanco, `.webp`) y suma una línea a `galeria` con el `itemId` del artículo.
 
 Los colores y las tipografías están como variables al inicio de `assets/css/styles.css`. Paleta oficial:
 

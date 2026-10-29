@@ -390,6 +390,29 @@
     });
   }
 
+  // ---------- Salto desde el carrusel ----------
+  // Abre la categoría del artículo, lo lleva al centro de la pantalla y lo resalta un momento.
+  // No cambia la cantidad: la persona decide cuántos quiere con los botones − / +.
+  function irAlArticulo(id) {
+    var fila = $("row-" + id);
+    if (!fila) { return; }
+    var sec = fila.closest(".group");
+    var toggle = sec && sec.querySelector(".group-toggle");
+    var caja = sec && sec.querySelector(".items");
+    if (toggle && caja) { toggle.setAttribute("aria-expanded", "true"); caja.hidden = false; }
+
+    var reducido = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    fila.scrollIntoView({ behavior: reducido ? "auto" : "smooth", block: "center" });
+    fila.classList.remove("flash");
+    void fila.offsetWidth; // reinicia la animación si se vuelve a tocar el mismo artículo
+    fila.classList.add("flash");
+    setTimeout(function () { fila.classList.remove("flash"); }, 1800);
+
+    var mas = fila.querySelector("button[data-d=\"1\"]");
+    if (mas) { mas.focus({ preventScroll: true }); }
+  }
+  SM.irAlArticulo = irAlArticulo;
+
   // ---------- Inicio ----------
   function iniciar() {
     if ($("fecha")) {

@@ -46,6 +46,22 @@
 
   <div class="wrap">
 
+    <section class="gallery" id="galeria" aria-roledescription="carrusel" aria-label="Nuestro mobiliario">
+      <div class="gal-head">
+        <div>
+          <h2>Conoce nuestro mobiliario</h2>
+          <p>Esto es lo que llevamos a tu evento. Elige un artículo y agrégalo a tu cotización.</p>
+        </div>
+        <div class="car-ctrl">
+          <button class="car-btn" id="car-pause" type="button" aria-label="Pausar el avance automático"></button>
+          <button class="car-btn" id="car-prev" type="button" aria-label="Anterior">‹</button>
+          <button class="car-btn" id="car-next" type="button" aria-label="Siguiente">›</button>
+        </div>
+      </div>
+      <div class="car-track" id="car-track" tabindex="0" aria-live="off"></div>
+      <div class="car-dots" id="car-dots"></div>
+    </section>
+
     <main class="main" id="cotizador">
       <div class="catalog" id="catalog"></div>
 
@@ -152,6 +168,7 @@
   <script src="assets/vendor/jspdf.umd.min.js" defer></script>
   <script src="assets/js/pdf.js" defer></script>
   <script src="assets/js/app.js" defer></script>
+  <script src="assets/js/carousel.js" defer></script>
 </body>
 
 </html>
